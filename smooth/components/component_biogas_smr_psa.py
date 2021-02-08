@@ -173,8 +173,6 @@ class BiogasSmrPsa(Component):
         self.bus_bg = None
         self.bus_el = None
         self.bus_h2 = None
-        self.ch4_share = 0.757  # values taken from Braga paper
-        self.co2_share = 0.243
         self.life_time = 20
         self.input_max = 500
         self.fuel_kwh_1kg_h2 = 45.977
@@ -183,21 +181,22 @@ class BiogasSmrPsa(Component):
 
         self.set_parameters(params)
 
-        if self.ch4_share + self.co2_share != 1:
-            raise ValueError("addition of all shares must be 1")
+        self.smr_psa_eff = None
+        self.energy_cnsmp_1kg_h2 = None
 
-        self.mol_mass_ch4 = 0.01604  # [kg/mol]
-        self.mol_mass_co2 = 0.04401  # [kg/mol]
-        self.heating_value_ch4 = 13.9
+    def prepare_simulation(self, components):
+        """Prepares the simulation by calculating the specific compression energy
 
-        self.heating_value_bg = ((self.ch4_share * self.mol_mass_ch4) /
-                                 ((self.ch4_share * self.mol_mass_ch4) +
-                                  (self.co2_share * self.mol_mass_co2))) * self.heating_value_ch4
+        :param components: list containing each component object
+        :type components: list
+        :return: the specific compression energy [Wh/kg]
+        """
 
-        self.bg_1kg_h2 = self.fuel_kwh_1kg_h2 / self.heating_value_bg
-        self.smr_eff = 1 / self.bg_1kg_h2
-        self.smr_psa_eff = self.smr_eff * self.psa_eff
-        self.energy_cnsmp_1kg_bg = (5.557 / self.bg_1kg_h2) * 1000
+        heating_value_bg = self.get_foreign_state_value(components, 0)
+        bg_1kg_h2 = self.fuel_kwh_1kg_h2 / heating_value_bg
+        smr_eff = 1 / bg_1kg_h2
+        self.smr_psa_eff = smr_eff * self.psa_eff
+        self.energy_cnsmp_1kg_bg = (5.557 / bg_1kg_h2) * 1000
 
     def create_oemof_model(self, busses, _):
         """Creates an oemof Transformer component using the information given in
