@@ -3,7 +3,6 @@ test/*
 build/*
 doc/build
 dist/*
-*.png
 *.pickle
 *.egg-info
 *.lp
