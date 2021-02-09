@@ -193,6 +193,7 @@ class BiogasSmrPsa(Component):
         """
 
         heating_value_bg = self.get_foreign_state_value(components, 0)
+        # heating_value_bg = 4.5
         bg_1kg_h2 = self.fuel_kwh_1kg_h2 / heating_value_bg
         smr_eff = 1 / bg_1kg_h2
         self.smr_psa_eff = smr_eff * self.psa_eff

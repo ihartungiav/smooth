@@ -34,6 +34,8 @@ class BiogasConverter(Component):
                                  ((self.ch4_share * self.mol_mass_ch4) +
                                   (self.co2_share * self.mol_mass_co2))) * self.heating_value_ch4
 
+        self.conv = self.kwh_1m3_bg / self.heating_value_bg
+
     def create_oemof_model(self, busses, _):
         """Creates an oemof Source component from the information given in the Supply
         class, to be used in the oemof model.
@@ -42,10 +44,10 @@ class BiogasConverter(Component):
         :type busses: list
         :return: 'from_grid' oemof component
         """
-        biogas_converter = solph.Source(
+        biogas_converter = solph.Transformer(
             label=self.name,
             inputs={busses[self.bg_in]: solph.Flow()},
             outputs={busses[self.bg_out]: solph.Flow()},
-            conversion_factors={busses[self.bg_out]: self.kwh_1m3_bg / self.heating_value_bg}
+            conversion_factors={busses[self.bg_out]: self.conv}
         )
         return biogas_converter
