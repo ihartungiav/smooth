@@ -1,3 +1,131 @@
+"""This is the core of smooth.
+It solves (M)ILP of an energy system model for discrete time steps using the
+Open Energy Modelling Framework solver (`oemof-solph <https://github.com/oemof/oemof-solph>`_).
+
+**********
+How to use
+**********
+The :func:`run_smooth` function expects an energy model. Such a model consists of:
+
+* energy sources
+* energy sinks
+* energy transformers
+* buses to transport energy
+
+Additionally, simulation parameters are needed to run the model.
+A model is  therefore defined as a dictionary containing all *components*,
+buses (grouped as *busses*) and simulation parameters (grouped as *sim_params*,
+see :class:`smooth.framework.simulation_parameters.SimulationParameters`).
+
+Example::
+
+    {
+        components: {
+            name_of_first_component: {
+                component: ...,
+                capex: ...,
+                opex: ...,
+                ...
+            },
+            ...
+        },
+        busses: [
+            name_of_first_bus,
+            name_of_second_bus,
+            ...
+        ],
+        sim_params: {
+            start_date: ...,
+            n_intervals: ...,
+            interval_time: ...,
+            interest_rate: 0.03,
+            ...
+        }
+    }
+
+.. note::
+    Legacy models (version < 0.2.0) define their components as a list
+    with an extra field *name* for each component. This is deprecated.
+
+******
+Result
+******
+Two items are returned. The second is a string describing the oemof solver return status.
+You want this to be 'ok', although `other values are possible
+<http://www.pyomo.org/blog/2015/1/8/accessing-solver>`_.
+The first item returned is a list of all components, each updated with
+
+- sim_params: the original simulation parameters, plus *date_time_index* \
+    for each time step and *sim_time_span* in minutes
+- results: results from the simulation
+
+    - variable_costs*
+    - art_costs*
+    - variable_emissions*
+    - annuity_capex
+    - annuity_opex
+    - annuity_variable_costs
+    - annuity_total
+    - annual_fix_emissions
+    - annual_op_emissions
+    - annual_variable_emissions
+    - annual_total_emissions
+- states: dictionary with component-specific attributes.\
+    Each entry is a list with values for each time step
+- flows: dictionary with each flow of this component.\
+    Key is tuple (from, to), entry is list with value for each time step
+- data: pandas dataframe
+- (component-specific attributes)
+
+\\* a list with a value for each time step
+
+**************
+Implementation
+**************
+The concept of :func:`run_smooth` is demonstrated in the figure below:
+
+.. figure:: /images/run_smooth.png
+    :width: 60 %
+    :alt: run_smooth.png
+    :align: center
+
+    Fig.1: Concept of run_smooth function.
+
+The :func:`run_smooth` function has three distinct phases:
+initialization, simulation and post processing.
+
+Initialization
+--------------
+There is not much to see here. Mainly, component instances get created from the
+model description. For legacy models (version < 0.2.0), the component list is
+converted to a dictionary. No oemof model is built here.
+
+Simulation
+----------
+This is the main part of the function. For each time step, an oemof model is
+solved and evaluated:
+
+#. print current time step to console if *print_progress* is set in parameters
+#. initialize oemof energy system model
+#. create buses
+#. update components and add them to the oemof model
+#. update bus constraints
+#. write lp file in current directory
+#. call solver for model
+#. check returned status for non#.optimal solution
+#. handle results for each component
+
+    #. update flows
+    #. update states
+    #. update costs
+    #. update emissions
+
+Post-processing
+---------------
+After all time steps have been computed, call the *generate_results* function of each component.
+Finally, return the updated components and the last oemof status.
+"""
+
 from oemof import solph
 from oemof.solph import processing
 from smooth.framework.simulation_parameters import SimulationParameters as sp
@@ -7,9 +135,14 @@ from smooth.framework.functions.functions import create_component_obj
 
 
 def run_smooth(model):
-    # Run the smooth simulation framework.
-    # Parameters:
-    #  model: smooth model object containing parameters for components, simulation and busses.
+    """Runs the smooth simulation framework
+
+    :param model: smooth model object containing parameters for components, simulation and busses
+    :type model: dictionary
+    :return: results of all components and oemof status
+    :rtype: tuple of components and string
+    :raises: *SolverNonOptimalError* if oemof result is not ok and not optimal
+    """
 
     # ------------------- INITIALIZATION -------------------
     # legacy: components may be list. Convert to dict.
@@ -79,8 +212,8 @@ def run_smooth(model):
         # ------------------- CHECK IF SOLVING WAS SUCCESSFUL -------------------
         # If the status and temination condition is not ok/optimal, get and
         # print the current flows and status
-        status = oemof_results["Solver"][0]["Status"].key
-        termination_condition = oemof_results["Solver"][0]["Termination condition"].key
+        status = oemof_results["Solver"][0]["Status"]
+        termination_condition = oemof_results["Solver"][0]["Termination condition"]
         if status != "ok" and termination_condition != "optimal":
             if sim_params.show_debug_flag:
                 new_df_results = processing.create_dataframe(model_to_solve)
@@ -92,19 +225,20 @@ def run_smooth(model):
         # ------------------- HANDLE RESULTS -------------------
         # Get the results of this oemof run.
         results = processing.results(model_to_solve)
-        results_dict = processing.parameter_as_dict(model_to_solve)
-        df_results = processing.create_dataframe(model_to_solve)
+        if sim_params.show_debug_flag:
+            results_dict = processing.parameter_as_dict(model_to_solve)
+            df_results = processing.create_dataframe(model_to_solve)
 
         # Loop through every component and call the result handling functions
         for this_comp in components:
             # Update the flows
-            this_comp.update_flows(results, sim_params)
+            this_comp.update_flows(results)
             # Update the states.
-            this_comp.update_states(results, sim_params)
+            this_comp.update_states(results)
             # Update the costs and artificial costs.
-            this_comp.update_var_costs(results, sim_params)
+            this_comp.update_var_costs(results)
             # Update the costs and artificial costs.
-            this_comp.update_var_emissions(results, sim_params)
+            this_comp.update_var_emissions(results)
 
     # Calculate the annuity for each component.
     for this_comp in components:
