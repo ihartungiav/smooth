@@ -6,5 +6,4 @@ oemof.network
 git+https://github.com/oemof/oemof-solph.git@dev
 scipy
 dill
-#pyutilib==5.8.0
 pyutilib
