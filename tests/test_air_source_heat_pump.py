@@ -8,11 +8,11 @@ def test_init():
     assert pump.cops is not None
 
     params = {"power_max": 0}
-    pump = ACDCConverter(params)
+    pump = AirSourceHeatPump(params)
     assert pump.output_power_max == params["power_max"]
 
 def test_create_oemof_model():
-    pump = ACDCConverter({
+    pump = AirSourceHeatPump({
         "bus_el": "bus_el",
         "bus_th": "bus_th"
     })
