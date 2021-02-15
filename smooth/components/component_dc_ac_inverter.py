@@ -60,6 +60,8 @@ class DCACInverter(Component):
         self.output_power_max = 150000
         self.efficiency = 0.99
 
+        self.set_parameters(params)
+
     def create_oemof_model(self, busses, _):
         """Creates a simple oemof Transformer component using the information
         given in the DCACInverter class, to be used in the oemof model

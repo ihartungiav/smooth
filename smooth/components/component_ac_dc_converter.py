@@ -72,6 +72,8 @@ class ACDCConverter(Component):
         # The efficiency of an AC-DC converter
         self.efficiency = 0.95
 
+        self.set_parameters(params)
+
     def create_oemof_model(self, busses, _):
         """Creates an oemof Transformer component using the information given in
         the ACDCConverter class, to be used in the oemof model
