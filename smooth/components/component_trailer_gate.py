@@ -72,12 +72,9 @@ class TrailerGate(Component):
         # ------------------- STATES -------------------
         self.flow_switch = None
 
-    def update_var_costs(self, results):
+    def update_var_costs(self):
         """Calculates variable costs of the component which only applies if the
         trailer is used, based on the distance travelled by the trailer.
-
-        :param results: oemof results object for this timestep
-        :type results: object
         """
         # First create an empty cost and art. cost array for this component, if it hasn't been
         # created before.
