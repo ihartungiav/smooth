@@ -10,6 +10,7 @@ def test_init():
     assert acdc.efficiency == params["efficiency"]
     assert acdc.output_power_max == params["output_power_max"]
 
+
 def test_create_oemof_model():
     acdc = ACDCConverter({
         "bus_el_ac": "bus_el_ac",
