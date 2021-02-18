@@ -3,8 +3,6 @@ from smooth.framework.simulation_parameters import SimulationParameters
 import oemof.solph as solph
 from oemof.outputlib import processing
 
-import pytest
-
 
 class TestBasic:
 
@@ -12,7 +10,7 @@ class TestBasic:
 
     def test_init(self):
         ely = Electrolyzer({"power_max": 100, "sim_params": self.sim_params})
-        assert ely.energy_max == 50 # 100kW, 30 minutes
+        assert ely.energy_max == 50  # 100W, 30 minutes
         assert ely.max_production_per_step is not None
 
     def test_create_oemof_model(self):
@@ -58,7 +56,7 @@ class TestUpdate:
 
     def test_update_states(self):
         # simulate one smooth iteration
-        # build energy model with two batteries, connected by a bus
+        # simulate a single electrolyzer, not connected to anything
         bus_el = solph.Bus(label="bus_el")
         bus_h2 = solph.Bus(label="bus_h2")
         self.oemof_model.add(bus_el)

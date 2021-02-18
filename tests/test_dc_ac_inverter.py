@@ -9,6 +9,7 @@ def test_init():
     dcac = DCACInverter(params)
     assert dcac.output_power_max == params["output_power_max"]
 
+
 def test_create_oemof_model():
     dcac = DCACInverter({
         "bus_el_ac": "bus_ac",
