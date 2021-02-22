@@ -22,33 +22,17 @@ The biogas SMR PSA component takes in a biogas bus and electricity bus as
 inputs, with a hydrogen bus output. An oemof Transformer component is
 chosen for this component, and is illustrated in Figure 1.
 
-INSERT FIGURE
+.. figure:: /images/steam_methane_reformer.png
+    :width: 60 %
+    :alt: steam_methane_reformer.png
+    :align: center
 
-Biogas composition
-------------------
-The user can determine the desired composition of biogas by stating the
-percentage share of methane and carbon dioxide in the gas. The default
-share is chosen to be 75.7% methane, 24.3% carbon dioxide [2]. The lower
-heating value (LHV) of methane is 13.9 kWh/kg [3], and the molar masses
-of methane and carbon dioxide are 0.01604 kg/mol and 0.04401 kg/mol,
-respectively. The method used to calculate the LHV of biogas is the same
-as in the Gas Engine CHP Biogas component, and the equation used is as follows:
-
-.. math::
-    LHV_{Bg} = \\frac{CH_{4_{share}} \\cdot M_{CH_{4}}}{CH_{4_{share}} \\cdot
-    M_{CH_{4}} + CO_{2_{share}} \\cdot M_{CO_{2}}} \\cdot LHV_{CH_{4}} \n
-
-* :math:`LHV_{Bg}` = heating value of biogas [kWh/kg]
-* :math:`CH_{4_{share}` = proportion of methane in biogas [-]
-* :math:`M_{CH_{4}}` = molar mass of methane [kg/mol]
-* :math:`CO_{2_{share}}` = proportion of carbon dioxide in biogas [-]
-* :math:`M_{CO_{2}}` = molar mass of carbon dioxide [kg/mol]
-* :math:`LHV_{CH_{4}}` = heating value of methane [kWh/kg]
+    Fig.1: Simple diagram of a biogas steam methane reformer
 
 Hydrogen production from SMR
 ----------------------------
 The amount of hydrogen produced in SMR from the chosen composition
-of biogas is calculated based on results from [4]. The default amount of
+of biogas is calculated based on results from [2]. The default amount of
 input fuel required to produce 1kg of H2 is 45.977 kWh, and using
 this value along with the LHV of biogas, the amount of biogas
 required to produce 1kg of H2 is determined:
@@ -72,7 +56,7 @@ Hydrogen purification with PSA
 ------------------------------
 The hydrogen produced in SMR contains many impurities such as carbon dioxide
 and carbon monoxide, and these can be removed using the PSA process.
-The default efficiency of the PSA process is taken to be 90 % [5], so the
+The default efficiency of the PSA process is taken to be 90 % [3], so the
 overall efficiency of the SMR PSA process is determiend by:
 
 .. math::
@@ -98,14 +82,10 @@ References
 [1] Song, C. et.al. (2015). Optimization of steam methane reforming coupled
 with pressure swing adsorption hydrogen production process by heat integration,
 Applied Energy.
-[2] Braga, L. B. et.al. (2013). Hydrogen production by biogas steam reforming:
-A technical, economic and ecological analysis, Renewable and Sustainable
-Energy Reviews.
-[3] Linde Gas GmbH (2013). Rechnen Sie mit Wasserstoff. Die Datentabelle.
-[4] Minh, D. P. et.al. (2018). Hydrogen Production From Biogas Reforming:
+[2] Minh, D. P. et.al. (2018). Hydrogen Production From Biogas Reforming:
 An Overview of Steam Reforming, Dry Reforming, Dual Reforming and
 Tri-Reforming of Methane.
-[5] Air Liquide Engineering & Construction (2021). Druckwechseladsorption
+[3] Air Liquide Engineering & Construction (2021). Druckwechseladsorption
 Wasserstoffreinigung Rückgewinnung und Reinigung von Wasserstoff durch PSA.
 """
 
@@ -124,10 +104,6 @@ class BiogasSmrPsa(Component):
     :type bus_el: str
     :param bus_h2: 99.9 % pure hydrogen bus that is the output of the component
     :type bus_h2: str
-    :param ch4_share: proportion of methane in biogas [-]
-    :type ch4_share: numerical
-    :param co2_share: proportion of carbon dioxide in biogas [-]
-    :type co2_share: numerical
     :param life_time: lifetime of the component [a]
     :type life_time: numerical
     :param input_max: maximum biogas input per interval [kg/*]
@@ -142,18 +118,6 @@ class BiogasSmrPsa(Component):
     :param set_parameters(params): updates parameter default values (see generic Component
         class)
     :type set_parameters(params): function
-    :param mol_mass_ch4: molar mass of methane [kg/mol]
-    :type mol_mass_ch4: numerical
-    :param mol_mass_co2: molar mass of carbon dioxide [kg/mol]
-    :type mol_mass_co2: numerical
-    :param heating_value_ch4: heating value of methane [kWh/kg]
-    :type heating_value_ch4: numerical
-    :param heating_value_bg: heating value of biogas [kWh/kg]
-    :type heating_value_bg: numerical
-    :param bg_1kg_h2: biogas required to produce one kg H2 [kg]
-    :type bg_1kg_h2: numerical
-    :param smr_eff: conversion efficiency from biogas to inpure hydrogen in SMR process [-]
-    :type smr_eff: numerical
     :param smr_psa_eff: total efficiency of biogas to 99.9 % pure hydrogen in SMR and
         PSA process [-]
     :type smr_psa_eff: numerical
@@ -182,7 +146,7 @@ class BiogasSmrPsa(Component):
         self.set_parameters(params)
 
         self.smr_psa_eff = None
-        self.energy_cnsmp_1kg_h2 = None
+        self.energy_cnsmp_1kg_bg = None
 
     def prepare_simulation(self, components):
         """Prepares the simulation by calculating the specific compression energy
@@ -193,7 +157,6 @@ class BiogasSmrPsa(Component):
         """
 
         heating_value_bg = self.get_foreign_state_value(components, 0)
-        # heating_value_bg = 4.5
         bg_1kg_h2 = self.fuel_kwh_1kg_h2 / heating_value_bg
         smr_eff = 1 / bg_1kg_h2
         self.smr_psa_eff = smr_eff * self.psa_eff
@@ -205,7 +168,7 @@ class BiogasSmrPsa(Component):
 
         :param busses: virtual buses used in the energy system
         :type busses: list
-        :return: the 'biogas steam reformer converter' oemof component
+        :return: 'biogas steam reformer converter' oemof component
         """
         biogas_smr_psa = solph.Transformer(
             label=self.name,
