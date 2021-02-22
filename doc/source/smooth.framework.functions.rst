@@ -36,14 +36,6 @@ smooth.framework.functions.load\_results module
    :undoc-members:
    :show-inheritance:
 
-smooth.framework.functions.plot\_interactive\_results module
-------------------------------------------------------------
-
-.. automodule:: smooth.framework.functions.plot_interactive_results
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 smooth.framework.functions.plot\_results module
 -----------------------------------------------
 
