@@ -9,6 +9,7 @@ def test_init():
     acdc = ElectricHeater(params)
     assert acdc.power_max == params["power_max"]
 
+
 def test_create_oemof_model():
     acdc = ElectricHeater({
         "bus_th": "bus_el",

@@ -1,9 +1,6 @@
 from smooth.components.component_compressor_h2 import CompressorH2
 from smooth.framework.simulation_parameters import SimulationParameters
 import oemof.solph as solph
-from oemof.outputlib import processing
-
-import pytest
 
 
 class TestBasic:
@@ -32,6 +29,6 @@ class TestBasic:
         assert type(model) == solph.Transformer
         assert len(model.inputs) == 2
         assert len(model.outputs) == 1
-        for k,v in model.inputs.items():
+        for k, v in model.inputs.items():
             if str(k) == "bus1":
                 assert v.nominal_value == 15

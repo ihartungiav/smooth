@@ -1,7 +1,9 @@
-from smooth.components.component_electrolyzer import Electrolyzer
+from smooth.components.component_electrolyzer_waste_heat import ElectrolyzerWasteHeat
 from smooth.framework.simulation_parameters import SimulationParameters
 import oemof.solph as solph
 from oemof.outputlib import processing
+
+import pytest
 
 
 class TestBasic:
@@ -9,26 +11,40 @@ class TestBasic:
     sim_params = SimulationParameters({"interval_time": 30})
 
     def test_init(self):
-        ely = Electrolyzer({"power_max": 100, "sim_params": self.sim_params})
-        assert ely.energy_max == 50  # 100W, 30 minutes
-        assert ely.max_production_per_step is not None
-
-    def test_create_oemof_model(self):
-        ely = Electrolyzer({
-            "bus_el": "bus1",
-            "bus_h2": "bus2",
+        with pytest.raises(AssertionError):
+            ely = ElectrolyzerWasteHeat({"sim_params": self.sim_params})
+        ely = ElectrolyzerWasteHeat({
+            "bus_th": None,
+            "power_max": 100,
             "sim_params": self.sim_params
         })
-        model = ely.create_oemof_model({
+        assert ely.energy_max == 50  # 100W, 30 minutes
+        assert ely.area_separator is not None
+
+    def test_create_oemof_model(self):
+        ely = ElectrolyzerWasteHeat({
+            "bus_el": "bus1",
+            "bus_h2": "bus2",
+            "bus_th": "bus3",
+            "sim_params": self.sim_params
+        })
+        oemof_model = solph.EnergySystem(
+            timeindex=self.sim_params.date_time_index[0:1],
+            freq='{}min'.format(self.sim_params.interval_time)
+        )
+        ely.create_oemof_model({
             "bus1": solph.Bus(label="bus1"),
-            "bus2": solph.Bus(label="bus2")
-        }, None)
-        assert type(model) == solph.custom.PiecewiseLinearTransformer
-        assert len(model.inputs) == 1
-        assert len(model.outputs) == 1
+            "bus2": solph.Bus(label="bus2"),
+            "bus3": solph.Bus(label="bus3")
+        }, oemof_model)
+        assert ely.model_h2 is not None and ely.model_th is not None
+
+        assert type(ely.model_th) == solph.custom.PiecewiseLinearTransformer
+        assert len(ely.model_th.inputs) == 1
+        assert len(ely.model_th.outputs) == 1
 
     def test_update_non_linear_behaviour(self):
-        ely = Electrolyzer({"sim_params": self.sim_params})
+        ely = ElectrolyzerWasteHeat({"bus_th": None, "sim_params": self.sim_params})
         ely.update_nonlinear_behaviour()
 
         # test supporting points. Assumes default values (apart from interval_time)
@@ -40,9 +56,12 @@ class TestBasic:
         energy = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
 
         for i in range(n_supporting_point + 1):
-            assert temp[i] == int(ely.supporting_points["temperature"][i])
-            assert h2[i] == int(ely.supporting_points["h2_produced"][i] * 1000)
-            assert energy[i] == int(ely.supporting_points["energy"][i] / 1000)
+            points = ely.supporting_points
+            assert temp[i] == int(points["temperature"][i])
+            assert h2[i] == int(points["h2_produced"][i] * 1000)
+            assert energy[i] == int(points["energy"][i] / 1000)
+            assert points["energy_halved"][i] == points["energy"][i] / 2
+            assert points["thermal_energy"][i] == 0
 
 
 class TestUpdate:
@@ -56,22 +75,25 @@ class TestUpdate:
 
     def test_update_states(self):
         # simulate one smooth iteration
-        # simulate a single electrolyzer, not connected to anything
+        # simulate a single electrolyzer with waste heat, not connected to other components
         bus_el = solph.Bus(label="bus_el")
         bus_h2 = solph.Bus(label="bus_h2")
+        bus_th = solph.Bus(label="bus_th")
         self.oemof_model.add(bus_el)
         self.oemof_model.add(bus_h2)
+        self.oemof_model.add(bus_th)
 
-        ely = Electrolyzer({
+        ely = ElectrolyzerWasteHeat({
             "bus_el": "bus_el",
             "bus_h2": "bus_h2",
+            "bus_th": "bus_th",
             "sim_params": self.sim_params
         })
-        ely_model = ely.create_oemof_model({
+        ely.create_oemof_model({
             "bus_el": bus_el,
-            "bus_h2": bus_h2
-        }, None)
-        self.oemof_model.add(ely_model)
+            "bus_h2": bus_h2,
+            "bus_th": bus_th
+        }, self.oemof_model)
 
         model_to_solve = solph.Model(self.oemof_model)
 
@@ -81,9 +103,8 @@ class TestUpdate:
         results = processing.results(model_to_solve)
         assert results is not None
 
-        old_temp = ely.temperature
         ely.update_states(results)
         # idle: cooling down, no water consumption
-        assert ely.temperature < old_temp
+        assert ely.temperature < ely.temp_init
         assert ely.states["temperature"][0] == ely.temperature
         assert ely.states["water_consumption"][0] == 0
