@@ -54,6 +54,9 @@ class Gate(Component):
         # ------------------- UPDATE PARAMETER DEFAULT VALUES -------------------
         self.set_parameters(params)
 
+        if self.max_input <= 0:
+            raise ValueError("The maximum input of the component must be greater than zero!")
+
     def create_oemof_model(self, busses, _):
         """Creates an oemof Transformer component from information given in
         the Gate class, to be used in the oemof model
