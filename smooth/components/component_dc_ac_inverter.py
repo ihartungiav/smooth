@@ -34,7 +34,7 @@ import oemof.solph as solph
 from .component import Component
 
 
-class DCACInverter(Component):
+class DcAcInverter(Component):
     """
     :param name: unique name given to the DC-AC inverter component
     :type name: str

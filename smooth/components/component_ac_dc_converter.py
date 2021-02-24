@@ -38,7 +38,7 @@ import oemof.solph as solph
 from .component import Component
 
 
-class ACDCConverter(Component):
+class AcDcConverter(Component):
     """
     :param name: unique name given to the AC-DC converter component
     :type name: str
