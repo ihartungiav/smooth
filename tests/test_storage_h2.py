@@ -24,7 +24,7 @@ class TestBasic:
 
         assert s.storage_level_init == 80
         assert s.storage_level_wanted == 80
-        
+
     def test_prepare_simulation(self):
         s = StorageH2({"sim_params": self.sim_params,
                        "vac_in": 3,
@@ -102,8 +102,8 @@ class TestUpdate:
 
         # update storage states
         s.update_states(results)
-        s.update_var_costs(results)
-        s.update_var_emissions(results)
+        s.update_var_costs()
+        s.update_var_emissions()
         s.generate_results()
 
         assert hasattr(s, "states")
