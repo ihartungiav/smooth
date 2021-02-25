@@ -48,7 +48,7 @@ class TestUpdate:
     def test_update_var_costs(self):
         component = com.Component()
         component.set_parameters({"sim_params": self.params})
-        component.update_var_costs(None)
+        component.update_var_costs()
         assert "variable_costs" in component.results.keys()
         assert sum(component.results["variable_costs"]) == 0
         assert "art_costs" in component.results.keys()
@@ -59,7 +59,7 @@ class TestUpdate:
     def test_update_var_emissions(self):
         component = com.Component()
         component.set_parameters({"sim_params": self.params})
-        component.update_var_emissions(None)
+        component.update_var_emissions()
         assert "variable_emissions" in component.results.keys()
         assert sum(component.results["variable_emissions"]) == 0
 
@@ -68,7 +68,7 @@ class TestUpdate:
     def test_get_costs(self):
         component = com.Component()
         component.set_parameters({"sim_params": self.params})
-        component.update_var_costs(None)
+        component.update_var_costs()
         assert component.get_costs_and_art_costs() == 0
         component.set_parameters({
             "variable_costs": 3,

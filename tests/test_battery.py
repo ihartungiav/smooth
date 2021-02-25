@@ -119,8 +119,8 @@ class TestUpdate:
         for battery in [b1, b2]:
             battery.update_flows(results)
             battery.update_states(results)
-            battery.update_var_costs(results)
-            battery.update_var_emissions(results)
+            battery.update_var_costs()
+            battery.update_var_emissions()
             battery.generate_results()
 
             assert hasattr(battery, "states")
