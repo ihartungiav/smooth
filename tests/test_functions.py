@@ -8,6 +8,7 @@ import pytest
 def test_create_component_obj():
     #dummy sim_params
     sim_params = SimulationParameters({})
+    test_path = os.path.join(os.path.dirname(__file__), 'test_timeseries')
 
     # can all components be created?
     _,_,files = next(os.walk("smooth/components/"))
@@ -36,14 +37,17 @@ def test_create_component_obj():
             comp["power_max"] = 1
         if name == "h2_chp":
             comp["power_max"] = 1
+        if name.endswith("csv"):
+            comp["csv_filename"] = "test_csv.csv"
+            comp["path"] = test_path
+        if name == "h2_refuel_cooling_system":
+            comp["csv_filename"] = "test_csv.csv"
+            comp["path"] = test_path
         if name == "air_source_heat_pump":
             # problem with oemof.thermal
             continue
-        if name.endswith("csv"):
-            # skip for now
-            continue
-        if name == "h2_refuel_cooling_system":
-            # needs csv: skip for now
-            continue
 
-        func.create_component_obj({"components": {"comp": comp}}, sim_params)
+        try:
+            func.create_component_obj({"components": {"comp": comp}}, sim_params)
+        except:
+            raise Exception("Exeption while creating {}".format(name))
