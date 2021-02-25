@@ -44,9 +44,9 @@ class TestBasic:
 
     def test_create_oemof_model(self):
         fc_chp = FuelCellChp({
-            "bus_h2": "bus_1",
-            "bus_el": "bus_2",
-            "bus_th": "bus_3",
+            "bus_h2": "bus1",
+            "bus_el": "bus2",
+            "bus_th": "bus3",
             "sim_params": self.sim_params
         })
 
@@ -67,5 +67,3 @@ class TestBasic:
         assert len(fc_chp.model_el.outputs) == 1
         assert len(fc_chp.model_th.inputs) == 1
         assert len(fc_chp.model_th.outputs) == 1
-
-
