@@ -11,7 +11,7 @@ class TestBasic:
     sim_params = SimulationParameters({"interval_time": 30})
 
     def test_init(self):
-        with pytest.raises(AssertionError):
+        with pytest.raises(KeyError):
             ely = ElectrolyzerWasteHeat({"sim_params": self.sim_params})
         ely = ElectrolyzerWasteHeat({
             "bus_th": None,
