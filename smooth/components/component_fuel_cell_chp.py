@@ -162,7 +162,7 @@ class FuelCellChp(Component):
         self.bus_el = None
         self.bus_th = None
         # Max. electrical output power [W].
-        self.power_max = 1000
+        self.power_max = None
         # Lifetime of the component [a]
         self.life_time = 15
         # Update the input parameters by the user.
