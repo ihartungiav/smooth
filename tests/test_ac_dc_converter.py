@@ -1,18 +1,18 @@
-from smooth.components.component_ac_dc_converter import ACDCConverter
+from smooth.components.component_ac_dc_converter import AcDcConverter
 import oemof.solph as solph
 
 
 def test_init():
-    acdc = ACDCConverter({})
+    acdc = AcDcConverter({})
 
     params = {"efficiency": 0, "output_power_max": 100}
-    acdc = ACDCConverter(params)
+    acdc = AcDcConverter(params)
     assert acdc.efficiency == params["efficiency"]
     assert acdc.output_power_max == params["output_power_max"]
 
 
 def test_create_oemof_model():
-    acdc = ACDCConverter({
+    acdc = AcDcConverter({
         "bus_el_ac": "bus_el_ac",
         "bus_el_dc": "bus_el_dc"
     })

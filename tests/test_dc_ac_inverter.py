@@ -1,17 +1,17 @@
-from smooth.components.component_dc_ac_inverter import DCACInverter
+from smooth.components.component_dc_ac_inverter import DcAcInverter
 import oemof.solph as solph
 
 
 def test_init():
-    dcac = DCACInverter({})
+    dcac = DcAcInverter({})
 
     params = {"output_power_max": 0}
-    dcac = DCACInverter(params)
+    dcac = DcAcInverter(params)
     assert dcac.output_power_max == params["output_power_max"]
 
 
 def test_create_oemof_model():
-    dcac = DCACInverter({
+    dcac = DcAcInverter({
         "bus_el_ac": "bus_ac",
         "bus_el_dc": "bus_dc"
     })
