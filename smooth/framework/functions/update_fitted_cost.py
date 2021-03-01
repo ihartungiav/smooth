@@ -1,13 +1,14 @@
 import math
+from smooth.framework.functions.functions import choose_valid_dict
 
 
 def update_financials(component, financials):
-    """ Calculate OPEX or CAPEX for this component.
+    """ Calculate "OPEX" or "CAPEX" for this component.
 
-    This function is calculating a fix CAPEX and OPEX value for components
-    where CAPEX and OPEX are dependant on certain values. The following list
-    shows possible fitting methods. The fitting method is chosen by the CAPEX
-    and OPEX key:
+    This function is calculating a fix "CAPEX" and "OPEX" value for components
+    where "CAPEX" and "OPEX" are dependant on certain values. The following list
+    shows possible fitting methods. The fitting method is chosen by the "CAPEX"
+    and "OPEX" key:
 
     * "fix"      --> already the fix value, nothing has to be done
     * "spec"     --> cost value needs to be multiplied with the dependant value
@@ -16,6 +17,11 @@ def update_financials(component, financials):
     * "free"     --> polynomial cost fitting with free choosable exponents
 
     If multiple keys are defined, the calculations are done sequentially in order.
+
+     * "variable" --> definition of multiple "CAPEX" or "OPEX" structures:
+    If the cost structure changes over the size of a specific value of the component, for example
+    because of the effects of economics of scale, the special key "variable" can be used to define
+    multiple "CAPEX" or "OPEX" dicts for different ranges of this value
 
     :param component: object of this component
     :type component: :class:`~smooth.components.component.Component`
@@ -26,6 +32,10 @@ def update_financials(component, financials):
     # Check if this financial dictionary is empty. If so, nothing has to be calculated.
     if not financials:
         return
+
+    # Check if 'variable' capex are beeing used, if so decide which capex is valid
+    if financials['key'] == 'variable':
+        financials = choose_valid_dict(component, financials)
 
     # If the keys are not given as a list, they are transformed to one so they can be iterated.
     if type(financials['key']) is not list:
@@ -59,8 +69,13 @@ def update_emissions(component, emissions):
 
     If multiple keys are defined, the calculations are done sequentially in order.
 
+     * "variable" --> definition of multiple "fix_emissions" or "op_emissions" structures:
+    If the emission structure changes over the size of a specific value of the component, for
+    example because of the effects of economics of scale, the special key "variable" can be used to
+    define multiple "fix_emissions" or "op_emissions" dicts for different ranges of this value
+
     :param component: object of this component
-    :type component: object
+    :type component:  component: :class:`~smooth.components.component.Component`
     :param emissions: emission object of this component
     :type emissions: fix_emissions or op_emissions dict
     """
@@ -68,6 +83,10 @@ def update_emissions(component, emissions):
     # Check if this emission dictionary is empty. If so, nothing has to be calculated.
     if not emissions:
         return
+
+    # Check if 'variable' capex are beeing used, if so decide which capex is valid
+    if emissions['key'] == 'variable':
+        emissions = choose_valid_dict(component, emissions)
 
     # If the keys are not given as a list, they are transformed to one so they can be iterated.
     if type(emissions['key']) is not list:
@@ -94,8 +113,8 @@ def update_cost(component, fitting_dict, index, dependant_value, name):
     :type fitting_dict: dict
     :param index: current position in fitting_dict
     :type index: integer
-    :param dependent_value: dependent attribute value of object
-    :type dependent_value: number
+    :param dependant_value: dependent attribute value of object
+    :type dependant_value: number
     :param name: human readable representation of attribute to be updated,
         e.g. "CAPEX/OPEX" or "emissions"
     :type name: string
@@ -127,8 +146,8 @@ def get_spec(component, fitting_dict, index, dependant_value):
     :type fitting_dict: dict
     :param index: current position in fitting_dict
     :type index: integer
-    :param dependent_value: dependent attribute value of object
-    :type dependent_value: number
+    :param dependant_value: dependent attribute value of object
+    :type dependant_value: number
     :return: calculated costs using a fitting value
     :rtype: number
     """
@@ -162,8 +181,8 @@ def get_exp(component, fitting_dict, index, dependant_value):
     :type fitting_dict: dict
     :param index: current position in fitting_dict
     :type index: integer
-    :param dependent_value: dependent attribute value of object
-    :type dependent_value: number
+    :param dependant_value: dependent attribute value of object
+    :type dependant_value: number
     :return: calculated costs using exponential fitting
     :rtype: number
     """
@@ -182,7 +201,7 @@ def get_exp(component, fitting_dict, index, dependant_value):
 
 
 def get_poly(component, fitting_dict, index, dependant_value):
-    """Case: An polynomial fitting of the cost function is wanted.
+    """Case: A polynomial fitting of the cost function is wanted.
 
     In this case, an arbitrary number of fitting parameters can be given.
     They will be used in the following order: fv_1, fv_2, fv_3, ... fv_n.
@@ -191,14 +210,20 @@ def get_poly(component, fitting_dict, index, dependant_value):
 
         fv_1 + fv_2*dependant_value + fv_3*dependant_value^2 + ... fv_n*dependant_value^(n-1)
 
+    It is possible to use the polynomial function to add different cost equations together.
+    This is achieved because the result of the initial equation used
+    (which can be any of the cost functions) is stored as the 'cost' variable, which can
+    then be used in a following polynomial function but now as a new free variable.
+    See the example_model_costs example for an applied case.
+
     :param component: object of this component
     :type component: :class:`~smooth.components.component.Component`
     :param fitting_dict: usually financial or emission object of this component
     :type fitting_dict: dict
     :param index: current position in fitting_dict
     :type index: integer
-    :param dependent_value: dependent attribute value of object
-    :type dependent_value: number
+    :param dependant_value: dependent attribute value of object
+    :type dependant_value: number
     :return: calculated costs using polynomial fitting
     :rtype: number
     """
@@ -211,6 +236,8 @@ def get_poly(component, fitting_dict, index, dependant_value):
     # In a loop, calculate the costs.
     cost = 0
     for i_fv in range(n_fv):
+        if fv[i_fv] == 'cost':
+            fv[i_fv] = fitting_dict['cost']
         cost += fv[i_fv] * dependant_value ** i_fv
 
     # Return the costs.
@@ -233,8 +260,8 @@ def get_free(component, fitting_dict, index, dependant_value):
     :type fitting_dict: dict
     :param index: current position in fitting_dict
     :type index: integer
-    :param dependent_value: dependent attribute value of object
-    :type dependent_value: number
+    :param dependant_value: dependent attribute value of object
+    :type dependant_value: number
     :return: calculated costs using "free" fitting
     :rtype: number
     :raises ValueError: if number of fitting values is odd
@@ -282,6 +309,9 @@ def get_dependant_value(component, fitting_dict, index, fixedCost):
 
     if fitting_dict['dependant_value'][index] == fixedCost:
         # If the capex are chosen as the dependant value, the capex costs are meant.
+        # Check if 'variable' capex are beeing used, if so decide which capex is valid
+        if dependant_value['key'] == 'variable':
+            dependant_value = choose_valid_dict(component, dependant_value)
         dependant_value = dependant_value['cost']
 
     return dependant_value

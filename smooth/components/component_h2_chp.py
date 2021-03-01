@@ -1,19 +1,57 @@
+"""
+This module represents another combined heat and power (CHP) system
+that uses hydrogen to generate electricity and heat. This module
+is comparable to the Fuel Cell CHP module, but using different
+efficiencies that are based on real life data.
+
+*****
+Scope
+*****
+The importance of a hydrogen CHP component in dynamic energy systems is its
+potential to enable better sector coupling between the electricity and
+heating sectors, thus less dependence on centralised power systems by
+offering the ability for localised energy supply [1].
+
+*******
+Concept
+*******
+The H2 CHP component has a hydrogen bus input and electrical and thermal
+bus outputs. Similarly to the fuel cell CHP component, the behaviour of
+the H2 CHP is non-linear and represented by oemof's Piecewise Linear
+Transformer component.
+
+.. figure:: /images/fuel_cell_chp.png
+    :width: 60 %
+    :alt: fuel_cell_chp.png
+    :align: center
+
+    Fig.1: Simple diagram of an H2 CHP.
+
+Efficiency
+----------
+The efficiency of the CHP is assumed to be constant
+
+For more detailed information, visit :ref:`Fuel Cell CHP`
+"""
+
+
 from smooth.components.component import Component
 import oemof.solph as solph
 import pyomo.environ as po
 
 
 class H2Chp(Component):
-    """ A combined heat and power plant with a h2 chp, using H2 to generate
-    electricity and heat. """
+    """
+    :param
+    """
 
     def __init__(self, params):
-
+        """Constructor method
+        """
         # Call the init function of the mother class.
         Component.__init__(self)
 
         # ------------------- PARAMETERS -------------------
-        # PARAMETERS TO CHANGE BY THE USER
         self.name = 'H2 CHP default name'
 
         # Busses (H2 in, electrical out, thermal out).
@@ -148,7 +186,7 @@ class H2Chp(Component):
 
         # First create the electrical oemof component.
         h2_chp_electric = solph.custom.PiecewiseLinearTransformer(
-            label=self.name+'_electric',
+            label=self.name + '_electric',
             inputs={busses[self.bus_h2]: flow_electric},
             outputs={busses[self.bus_el]: solph.Flow()},
             in_breakpoints=self.bp_h2_consumed_electric_half,
@@ -157,7 +195,7 @@ class H2Chp(Component):
 
         # Then create the thermal oemof component.
         h2_chp_thermal = solph.custom.PiecewiseLinearTransformer(
-            label=self.name+'_thermal',
+            label=self.name + '_thermal',
             inputs={busses[self.bus_h2]: flow_thermal},
             outputs={busses[self.bus_th]: solph.Flow()},
             in_breakpoints=self.bp_h2_consumed_thermal_half,
@@ -198,10 +236,12 @@ class H2Chp(Component):
             expr += - model.flow[busses[self.bus_h2], self.model_el, t]
             return (expr == 0)
 
-        model_to_solve.chp_flow_ratio_fix = po.Constraint(
-            model_to_solve.TIMESTEPS, rule=chp_ratio_rule)
+        setattr(model_to_solve,
+                'chp_flow_ratio_fix_{}'.format(self.name.replace(' ', '')),
+                po.Constraint(model_to_solve.TIMESTEPS, rule=chp_ratio_rule)
+                )
 
-    def update_flows(self, results, sim_params):
+    def update_flows(self, results):
         # Check if the component has an attribute 'flows', if not, create it as an empty dict.
-        Component.update_flows(self, results, sim_params, self.name + '_electric')
-        Component.update_flows(self, results, sim_params, self.name + '_thermal')
+        Component.update_flows(self, results, self.name + '_electric')
+        Component.update_flows(self, results, self.name + '_thermal')
