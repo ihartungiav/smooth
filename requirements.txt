@@ -4,6 +4,7 @@ numpy
 oemof.network
 # oemof.solph
 git+https://github.com/oemof/oemof-solph.git@dev
+oemof.thermal
 scipy
 dill
 pyutilib
