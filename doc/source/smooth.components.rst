@@ -82,14 +82,6 @@ Component - The mother class of all components
    :undoc-members:
    :show-inheritance:
 
-AC-DC Converter
--------------------------------------------
-
-.. automodule:: smooth.components.component_ac_dc_converter
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Air Source Heat Pump
 -------------------------------------------
 
@@ -110,14 +102,6 @@ Compressor (Hydrogen)
 --------------------------------------------------
 
 .. automodule:: smooth.components.component_compressor_h2
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   
-DC-AC Inverter
----------------------------------------
-
-.. automodule:: smooth.components.component_dc_ac_inverter
    :members:
    :undoc-members:
    :show-inheritance:
@@ -201,6 +185,15 @@ PEM Electrolyzer
    :members:
    :undoc-members:
    :show-inheritance:
+
+Power Converter
+------------------------------------------------------------
+
+.. automodule:: smooth.components.component_power_converter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
    
 Sink
 ----------------------------------------
