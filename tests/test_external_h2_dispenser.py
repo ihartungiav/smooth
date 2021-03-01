@@ -2,6 +2,7 @@ from smooth.components.external_component_h2_dispenser import H2Dispenser
 
 from os import path
 
+
 def test_init():
     # basic creation
     test_path = path.join(path.dirname(__file__), 'test_timeseries')

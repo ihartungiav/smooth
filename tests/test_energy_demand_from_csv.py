@@ -22,11 +22,11 @@ class TestBasic:
                                       "nominal_value": 2})
         assert demand.nominal_value == 2
 
-        #todo: raise error if "None" is passed as csv_filename variable
-        #todo: assert file is csv type
+        # todo: raise error if "None" is passed as csv_filename variable
+        # todo: assert file is csv type
 
     def test_create_oemof_model(self):
- 
+
         test_path = os.path.join(os.path.dirname(__file__), 'test_timeseries')
         self.sim_params.i_interval = 0
 

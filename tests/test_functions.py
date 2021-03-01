@@ -2,7 +2,6 @@ import smooth.framework.functions.functions as func
 from smooth.framework.simulation_parameters import SimulationParameters
 
 import os
-import pytest
 
 
 def test_read_data_file():
@@ -16,13 +15,14 @@ def test_read_data_file():
     for idx in range(len(data)):
         assert data[data.columns[0]][idx] == 1
 
+
 def test_create_component_obj():
-    #dummy sim_params
+    # dummy sim_params
     sim_params = SimulationParameters({})
     test_path = os.path.join(os.path.dirname(__file__), 'test_timeseries')
 
     # can all components be created?
-    _,_,files = next(os.walk("smooth/components/"))
+    _, _, files = next(os.walk("smooth/components/"))
     for f in files:
         if f == "__init__.py":
             continue
@@ -60,5 +60,5 @@ def test_create_component_obj():
 
         try:
             func.create_component_obj({"components": {"comp": comp}}, sim_params)
-        except:
+        except Exception:
             raise Exception("Exeption while creating {}".format(name))

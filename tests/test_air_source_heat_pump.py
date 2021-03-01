@@ -11,6 +11,7 @@ def test_init():
     pump = AirSourceHeatPump(params)
     assert pump.output_power_max == params["power_max"]
 
+
 def test_create_oemof_model():
     pump = AirSourceHeatPump({
         "bus_el": "bus_el",

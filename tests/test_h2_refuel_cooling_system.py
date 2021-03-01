@@ -32,9 +32,9 @@ class TestBasic:
         self.sim_params.i_interval = 0
 
         rcs = H2RefuelCoolingSystem({"bus_el": "foo",
-                                      "csv_filename": "test_csv.csv",
-                                      "path": test_path,
-                                      "sim_params": self.sim_params})
+                                     "csv_filename": "test_csv.csv",
+                                     "path": test_path,
+                                     "sim_params": self.sim_params})
 
         model = rcs.create_oemof_model({"foo": solph.Bus(label="foo")}, None)
         assert type(model) == solph.network.Sink

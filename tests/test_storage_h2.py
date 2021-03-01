@@ -58,7 +58,7 @@ class TestBasic:
         })
 
         model = s.create_oemof_model({"foo": solph.Bus(label="foo"),
-                                    "bar": solph.Bus(label="bar")}, None)
+                                      "bar": solph.Bus(label="bar")}, None)
         assert type(model) == solph.components.GenericStorage
         assert len(model.inputs) == 1
         assert len(model.outputs) == 1
