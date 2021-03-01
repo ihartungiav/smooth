@@ -5,6 +5,17 @@ import os
 import pytest
 
 
+def test_read_data_file():
+    test_path = os.path.join(os.path.dirname(__file__), 'test_timeseries')
+    file_name = "test_csv.csv"
+    # by index
+    data = func.read_data_file(test_path, file_name, ",", 0)
+    # by name
+    data = func.read_data_file(test_path, file_name, ",", "Simple test csv")
+    assert len(data) == 168
+    for idx in range(len(data)):
+        assert data[data.columns[0]][idx] == 1
+
 def test_create_component_obj():
     #dummy sim_params
     sim_params = SimulationParameters({})
