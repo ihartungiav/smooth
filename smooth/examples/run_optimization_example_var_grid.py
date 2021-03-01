@@ -1,4 +1,4 @@
-from smooth.examples.example_VarGrid.example_model_var_grid import mymodel
+from smooth.examples.example_model_var_grid import mymodel
 from multiprocessing import freeze_support
 from smooth import run_optimization, save_results
 
@@ -24,7 +24,7 @@ def main():
 
     opt_params['ga_params'] = {
         'population_size': 8,
-        'n_generation': 4,
+        'n_generation': 2,
         'n_core': 'max',
         'plot_progress': True,
         'post_processing': True,

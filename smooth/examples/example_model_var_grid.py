@@ -16,9 +16,9 @@ components.append({
     'component': 'energy_demand_from_csv',
     'name': 'el_demand',
     'bus_in': 'bel',
-    'csv_filename': 'demand.csv',
-    'nominal_value': 1000,  # Umrechnungsfaktor in Wh
-    'column_title': 'electrical load',
+    'csv_filename': 'ts_oemof_test_input_data.csv',
+    'nominal_value': 1000000,  # Umrechnungsfaktor in Wh
+    'column_title': 'demand_el',
     'path': my_path
 })
 
@@ -27,9 +27,9 @@ components.append({
     'name': 'from_grid',
     'bus_out': 'bel',
 
-    # This example works with grid level 5,
-    # while 3 and 4 result in 'termination condition infeasible'
-    'grid_level': 5,
+    # This example works with grid level 4 and 5,
+    # while grid level 3 results in 'termination condition infeasible'
+    'grid_level': 4,
     'grid_l3_output_max': 540 * 1e3,  # In W
     'grid_l4_output_max': 1.5 * 1e6,  # In W
     'grid_l5_output_max': 3 * 1e6,  # In W
@@ -47,7 +47,14 @@ components.append({
         'fitting_value': [[1000000, 0.01]],
         'dependant_value': ['output_max']},
 
-    'variable_costs': 0.20 / 1000,  # €/Wh
+    'variable_costs_l3': 16 / 1000,  # € / Wh
+    'variable_costs_l4': 17 / 1000,  # € / Wh
+    'variable_costs_l5': 18 / 1000,  # € / Wh
+
+    'opex_l3': {'key': ['spec'], 'fitting_value': [0.08], 'dependant_value': ['output_max']},
+    'opex_l4': {'key': ['spec'], 'fitting_value': [0.075], 'dependant_value': ['output_max']},
+    'opex_l5': {'key': ['spec'], 'fitting_value': [0.07], 'dependant_value': ['output_max']},
+
     'dependency_flow_costs': ('from_grid', 'bel'),
     'life_time': 50,
 

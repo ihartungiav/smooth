@@ -28,6 +28,7 @@ from smooth.examples.example_model import mymodel
 # from smooth.examples.example_model_external_components import mymodel
 # from smooth.examples.example_model_infeasable import mymodel
 # from smooth.examples.example_model_trailer import mymodel
+from smooth.examples.example_model_var_grid import mymodel
 
 from smooth import run_smooth
 from smooth import plot_smooth_results
