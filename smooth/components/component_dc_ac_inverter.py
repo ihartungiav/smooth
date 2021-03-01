@@ -34,7 +34,7 @@ import oemof.solph as solph
 from .component import Component
 
 
-class DCACInverter(Component):
+class DcAcInverter(Component):
     """
     :param name: unique name given to the DC-AC inverter component
     :type name: str
@@ -59,6 +59,8 @@ class DCACInverter(Component):
         self.bus_el_dc = None
         self.output_power_max = 150000
         self.efficiency = 0.99
+
+        self.set_parameters(params)
 
     def create_oemof_model(self, busses, _):
         """Creates a simple oemof Transformer component using the information

@@ -38,7 +38,7 @@ import oemof.solph as solph
 from .component import Component
 
 
-class ACDCConverter(Component):
+class AcDcConverter(Component):
     """
     :param name: unique name given to the AC-DC converter component
     :type name: str
@@ -71,6 +71,8 @@ class ACDCConverter(Component):
 
         # The efficiency of an AC-DC converter
         self.efficiency = 0.95
+
+        self.set_parameters(params)
 
     def create_oemof_model(self, busses, _):
         """Creates an oemof Transformer component using the information given in

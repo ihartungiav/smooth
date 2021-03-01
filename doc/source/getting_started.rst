@@ -108,16 +108,10 @@ An outline and brief description of the available functions in the framework is 
 * :func:`~smooth.framework.functions.load_results`: loads the saved results of either a 
   simulation or optimization. Can be called by the user in a file where the results are 
   evaluated.
-* :func:`~smooth.framework.functions.plot_interactive_results`: plots interactive results of a
-  SMOOTH run, which can be called after the simulation/optimization results are obtained.
 * :func:`~smooth.framework.functions.plot_results`: plots results of a SMOOTH run, which can 
   be called after the simulation/optimization results are obtained.
 * :func:`~smooth.framework.functions.print_results`: prints the financial results of a 
   SMOOTH run, which can be called after the simulation/optimization results are obtained.
-* :func:`~smooth.framework.functions.save_important_parameters`: saves the most important
-  parameters from the optimization results in a CSV file, automatically generates pie plots
-  of certain results and saves all of the flows in a dataframe. Can be called in a file
-  where the results are evaluated.
 * :func:`~smooth.framework.functions.save_results`: saves the results of either a SMOOTH
   run or an optimization, which can be called after the results are obtained.
 * :func:`~smooth.framework.functions.update_annuities`: calculates and updates the financial
