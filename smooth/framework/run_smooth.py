@@ -236,9 +236,9 @@ def run_smooth(model):
             # Update the states.
             this_comp.update_states(results)
             # Update the costs and artificial costs.
-            this_comp.update_var_costs(results)
+            this_comp.update_var_costs()
             # Update the costs and artificial costs.
-            this_comp.update_var_emissions(results)
+            this_comp.update_var_emissions()
 
     # Calculate the annuity for each component.
     for this_comp in components:

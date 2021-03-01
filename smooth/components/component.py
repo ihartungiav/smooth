@@ -178,12 +178,10 @@ class Component:
 
     # ------------------- UPDATE THE COSTS -------------------
 
-    def update_var_costs(self, results):
+    def update_var_costs(self):
         """
         Tracks the cost and artificial costs of a component for each time step.
 
-        :param results: The oemof results object for the given time step
-        :type results: object
         :return: New values for the updated variable and artificial costs stored in
             results['variable_costs'] and results['art_costs'] respectively
         """
@@ -210,11 +208,9 @@ class Component:
             self.results['art_costs'][self.sim_params.i_interval] = \
                 this_dependency_value * self.sim_params.interval_time / 60 * self.artificial_costs
 
-    def update_var_emissions(self, results):
+    def update_var_emissions(self):
         """Tracks the emissions of a component for each time step.
 
-        :param results: The oemof results object for the given time step
-        :type results: object
         :return: A new value for the updated emissions stored in results['variable_emissions']
         """
         # First create an empty emission array for this component, if it hasn't been created before.
