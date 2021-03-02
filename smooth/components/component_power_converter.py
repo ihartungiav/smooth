@@ -78,16 +78,17 @@ class PowerConverter(Component):
 
     def create_oemof_model(self, busses, _):
         """Creates an oemof Transformer component using the information given in
-        the ACDCConverter class, to be used in the oemof model
+        the PowerConverter class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
-        :return: the oemof AC DC converter component
+        :type busses: dict
+        :return: the oemof power_converter component
         """
         power_converter = solph.Transformer(
             label=self.name,
-            inputs={busses[self.bus_input]: solph.Flow(
-                variable_costs=0)},
+            # inputs={busses[self.bus_input]: solph.Flow(
+            #     variable_costs=0)},
+            inputs={busses[self.bus_input]: solph.Flow()},
             outputs={busses[self.bus_output]: solph.Flow(
                 nominal_value=self.output_power_max
             )},
