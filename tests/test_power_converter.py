@@ -3,8 +3,7 @@ import oemof.solph as solph
 
 
 def test_init():
-    # acdc = AcDcConverter({})
-
+    power_converter = PowerConverter({})
     params = {"efficiency": 0, "output_power_max": 100}
     power_converter = PowerConverter(params)
     assert power_converter.efficiency == params["efficiency"]

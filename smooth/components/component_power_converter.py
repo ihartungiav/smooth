@@ -86,8 +86,6 @@ class PowerConverter(Component):
         """
         power_converter = solph.Transformer(
             label=self.name,
-            # inputs={busses[self.bus_input]: solph.Flow(
-            #     variable_costs=0)},
             inputs={busses[self.bus_input]: solph.Flow()},
             outputs={busses[self.bus_output]: solph.Flow(
                 nominal_value=self.output_power_max
