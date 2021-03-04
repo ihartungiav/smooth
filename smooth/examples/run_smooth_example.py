@@ -40,9 +40,9 @@ from smooth.examples.example_plotting_dicts import comp_dict_german
 if __name__ == '__main__':
     # Run an example.
     smooth_result, status = run_smooth(mymodel)
-    plot_smooth_results(smooth_result, comp_dict_german)
     print_smooth_results(smooth_result)
-    save_results('example_results', smooth_result)
     external_components = costs_for_ext_components(mymodel)
+    plot_smooth_results(smooth_result, comp_dict_german)
+    save_results('example_results', smooth_result)
 
     print('done')
