@@ -19,7 +19,7 @@ An oemof Transformer component is used to convert the chosen input bus into the
 chosen output bus, with a limitation on the value that can be transformed
 per timestep by the defined maximum input parameter. Applying an efficiency
 to the conversion of the input bus to the output bus is optional, with the
-default value set to 100%. 
+default value set to 100%.
 """
 
 import oemof.solph as solph
