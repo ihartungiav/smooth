@@ -274,6 +274,14 @@ Trailer H2 Delivery Single
    :undoc-members:
    :show-inheritance:
 
+Variable Grid
+------------------------------------------
+
+.. automodule:: smooth.components.component_var_grid
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 External Components
 ------------------------------------------
 
