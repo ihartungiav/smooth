@@ -50,4 +50,4 @@ def plot_smooth_results(smooth_result, comp_label_dict=comp_dict_german,
         except KeyError:
             plt.title('bus: ' + this_bus)
             # no label for y axis
-    plt.show(block=True)
+    plt.show(block=False)
