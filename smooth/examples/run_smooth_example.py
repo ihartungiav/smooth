@@ -23,7 +23,7 @@ This example shows how a simulation in SMOOTH can be defined.
 from smooth.examples.example_model import mymodel
 # from smooth.examples.example_model_costs import mymodel
 # from smooth.examples.example_model_dict import mymodel
-# from smooth.examples.example_model_electrical_components_ACDC import mymodel
+# from smooth.examples.example_model_electrical_components import mymodel
 # from smooth.examples.example_model_emissions import mymodel
 # from smooth.examples.example_model_external_components import mymodel
 # from smooth.examples.example_model_infeasable import mymodel
