@@ -237,13 +237,15 @@ class StratifiedThermalStorage (Component):
 
         self.current_vac = [vac_in, vac_out]
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof GenericStorage component from the information given in the
         Stratified Thermal Storage class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
         :type busses: list
-        :return: the oemof thermal storage component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         thermal_storage = solph.components.GenericStorage(
             label=self.name,
@@ -260,6 +262,8 @@ class StratifiedThermalStorage (Component):
             inflow_conversion_factor=1,
             outflow_conversion_factor=1,
             balanced=False)
+
+        model.add(thermal_storage)
         return thermal_storage
 
     def update_states(self, results):

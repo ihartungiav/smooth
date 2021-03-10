@@ -245,7 +245,7 @@ class PemElectrolyzer(Component):
         # Return the according waste heat energy value [Wh]
         return self.bp_waste_heat_energy[this_index]
 
-    def create_oemof_model(self, busses, model):
+    def add_to_oemof_model(self, busses, model):
         """Creates two separate oemof Piecewise Linear Transformer components for the
         hydrogen and waste heat production of the PEM electrolyzer from information
         given in the PEMElectrolyzer class, to be used in the oemof model
@@ -255,7 +255,7 @@ class PemElectrolyzer(Component):
         :param model: oemof model containing the hydrogen production and
             waste heat production of the PEM electrolyzer
         :type model: model
-        :return: the oemof PEM electrolyzer hydrogen and waste heat components
+        :return: tuple of H2 and waste heat oemof components
         """
         # The PEM electrolyzer has to be modelled as two components, while the
         # piecewise linear transformer does not accept 2 outputs yet.
@@ -289,7 +289,7 @@ class PemElectrolyzer(Component):
         self.model_h2 = pem_electrolyzer_h2_prod
         self.model_th = pem_electrolyzer_waste_heat
 
-        return None
+        return (pem_electrolyzer_h2_prod, pem_electrolyzer_waste_heat)
 
     def update_constraints(self, busses, model_to_solve):
         """Set a constraint so that the electricity inflow of the hydrogen and

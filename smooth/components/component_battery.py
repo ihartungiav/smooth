@@ -54,7 +54,7 @@ the input-flow/output-flow between bus and battery needs to include the energy l
 
     P_{out,max} = P_{discharge,max} \\cdot \\mu_{discharge}
 Due to the inflow_conversion_factor / outflow_conversion_factor
-(in :func:`~smooth.components.component_battery.Battery.create_oemof_model`)
+(in :func:`~smooth.components.component_battery.Battery.add_to_oemof_model`)
 the battery will then receive right amount.
 
 * :math:`P_{charge,max}` = maximum chargeable power at the battery [W]
@@ -228,13 +228,15 @@ class Battery(Component):
         self.p_in_max = self.c_rate_charge * self.battery_capacity / self.efficiency_charge
         self.p_out_max = self.c_rate_discharge * self.battery_capacity * self.efficiency_discharge
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Generic Storage component from the information given in
         the Battery class, to be used in the oemof model.
 
         :param busses: List of the virtual buses used in the energy system
         :type busses: list
-        :return: The 'battery' oemof component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         battery = solph.components.GenericStorage(
             label=self.name,
@@ -252,6 +254,7 @@ class Battery(Component):
             outflow_conversion_factor=self.efficiency_discharge,
             balanced=False,
         )
+        model.add(battery)
         return battery
 
     def update_states(self, results):

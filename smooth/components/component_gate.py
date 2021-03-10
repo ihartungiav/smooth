@@ -59,13 +59,15 @@ class Gate(Component):
         # ------------------- UPDATE PARAMETER DEFAULT VALUES -------------------
         self.set_parameters(params)
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Transformer component from information given in
         the Gate class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
         :type busses: list
-        :return: oemof 'gate' component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         gate = solph.Transformer(
             label=self.name,
@@ -74,4 +76,6 @@ class Gate(Component):
             outputs={busses[self.bus_out]: solph.Flow()},
             conversion_factors={busses[self.bus_out]: self.efficiency}
         )
+
+        model.add(gate)
         return gate

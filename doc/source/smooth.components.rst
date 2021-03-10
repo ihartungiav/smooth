@@ -18,7 +18,7 @@ In order to build a component, you must do the following:
 
 #. Define any other functions that are specific to your component.
 
-#. All components built in SMOOTH must be created as oemof components to be used in the oemof model (see `oemof-solph's component list <https://oemof-solph.readthedocs.io/en/latest/usage.html#solph-components>`_ to choose the best fitting component). Then create the oemof component in the :func:`create_oemof_model` function, defining all of the necessary parameters.
+#. All components built in SMOOTH must be created as oemof components to be used in the oemof model (see `oemof-solph's component list <https://oemof-solph.readthedocs.io/en/latest/usage.html#solph-components>`_ to choose the best fitting component). Then add the component to your oemof model using the :func:`add_to_oemof_model` function, defining all of the necessary parameters.
 
 #. If the states of the component need updating after each time step, specifiy these in the :func:`update_states` function. 
 

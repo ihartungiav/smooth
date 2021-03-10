@@ -74,13 +74,15 @@ class ElectricHeater(Component):
         # ------------------- UPDATE PARAMETER DEFAULT VALUES -------------------
         self.set_parameters(params)
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Transformer component from the information given in the
         ElectricHeater class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
         :type busses: list
-        :return: 'electric_heater' oemof component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         electric_heater = solph.Transformer(
             label=self.name,
@@ -89,4 +91,5 @@ class ElectricHeater(Component):
                 nominal_value=self.power_max)},
             conversion_factors={busses[self.bus_th]: self.efficiency})
 
+        model.add(electric_heater)
         return electric_heater
