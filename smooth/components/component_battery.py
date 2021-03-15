@@ -37,34 +37,38 @@ the system to maintain the wanted storage level.
 
 Maximum chargeable/dischargeable energy
 ---------------------------------------
-The maximum chargeable or dischargeable power [W] going in to or out of the battery is dependant
-on the C-rate and the capacity:
+The maximum power [W] going in to or out of the battery are dependant on
+the C-rate and the capacity:
 
 .. math::
-    P_{charge,max} = E_{cap} \\cdot C_{r,charge}
+    P_{in,max} = E_{cap} \\cdot C_{r,charge}
 
-    P_{discharge,max} = E_{cap} \\cdot C_{r,discharge}
-To ensure that the battery can be charged and discharged within the time frame inherently defined
-by the C-rate (1C : Full capacity can be (dis-)charged within one hour), the nominal value of
-the input-flow/output-flow between bus and battery needs to include the energy losses during the
-(dis-)charging process:
+    P_{out,max} = E_{cap} \\cdot C_{r,discharge}
+
+* :math:`P_{in,max}` = maximum power flowing from bus to battery [W]
+* :math:`E_{cap}` = battery capacity [Wh]
+* :math:`C_{r,charge}` = C-Rate for charging [W/Wh]
+* :math:`P_{out,max}` = maximum power flowing from battery to bus [W]
+* :math:`C_{r,discharge}` = C-Rate for discharging [W/Wh]
+
+.. figure:: /images/battery_losses.png
+    :width: 60 %
+    :alt: battery.png
+    :align: center
+
+    Fig.2: Diagram of the battery component including losses.
+
+The amount of energy, that the battery will be charged or discharged
+includes the energy losses during the (dis-)charging process:
 
 .. math::
-    P_{in,max} = P_{charge,max} / \\mu_{charge}
+    P_{charge,max} = P_{in,max} \\cdot \\mu_{charge}
 
     P_{out,max} = P_{discharge,max} \\cdot \\mu_{discharge}
-Due to the inflow_conversion_factor / outflow_conversion_factor
-(in :func:`~smooth.components.component_battery.Battery.create_oemof_model`)
-the battery will then receive right amount.
 
 * :math:`P_{charge,max}` = maximum chargeable power at the battery [W]
-* :math:`E_{cap}` = battery capacity [Wh]
-* :math:`C_{r,charge}` = C-Rate for charging [-/h]
-* :math:`P_{discharge,max}` = maximum dischargeable power at the battery [W]
-* :math:`C_{r,discharge}` = C-Rate for discharging [-/h]
-* :math:`P_{in,max}` = maximum nominal power flowing from bus to battery [W]
 * :math:`\\mu_{charge}` = charging efficiency [-]
-* :math:`P_{out,max}` = maximum nominal power flowing from battery to bus [W]
+* :math:`P_{discharge,max}` = maximum dischargeable power at the battery [W]
 * :math:`\\mu_{discharge}` = discharging efficiency [-]
 """
 
@@ -222,11 +226,9 @@ class Battery(Component):
 
         # ToDo: c_rate depending on the soc
 
-        # As explained above, the nominal in- / and outflow of power include the battery capacity,
-        # the C-rate and the (dis-)charging efficiencies.
-
-        self.p_in_max = self.c_rate_charge * self.battery_capacity / self.efficiency_charge
-        self.p_out_max = self.c_rate_discharge * self.battery_capacity * self.efficiency_discharge
+        # The in- / and outflow of power are calculated using the battery capacity and the C-rate
+        self.p_in_max = self.c_rate_charge * self.battery_capacity
+        self.p_out_max = self.c_rate_discharge * self.battery_capacity
 
     def create_oemof_model(self, busses, _):
         """Creates an oemof Generic Storage component from the information given in
