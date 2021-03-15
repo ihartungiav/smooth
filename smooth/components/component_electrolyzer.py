@@ -254,13 +254,15 @@ class Electrolyzer (Component):
         # Return the according hydrogen production value [kg].
         return self.supporting_points['h2_produced'][this_index]
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Transformer component from the information given in the
         Electrolyzer class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
         :type busses: list
-        :return: the oemof electrolyzer component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         # Get the non-linear behaviour.
         self.update_nonlinear_behaviour()
@@ -275,6 +277,8 @@ class Electrolyzer (Component):
             in_breakpoints=self.supporting_points['energy'],
             conversion_function=self.conversion_fun_ely,
             pw_repn='CC')
+
+        model.add(electrolyzer)
         return electrolyzer
 
     def update_nonlinear_behaviour(self):

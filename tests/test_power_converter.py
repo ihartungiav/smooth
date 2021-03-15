@@ -10,16 +10,18 @@ def test_init():
     assert power_converter.output_power_max == params["output_power_max"]
 
 
-def test_create_oemof_model():
+def test_add_to_oemof_model():
     power_converter = PowerConverter({
         "bus_input": "bus_input",
         "bus_output": "bus_output"
     })
-    model = power_converter.create_oemof_model({
+    model = solph.EnergySystem()
+    comp = power_converter.add_to_oemof_model({
         "bus_input": solph.Bus(label="bus_input"),
         "bus_output": solph.Bus(label="bus_output"),
-    }, None)
+    }, model)
 
-    assert type(model) == solph.Transformer
-    assert len(model.inputs) == 1
-    assert len(model.outputs) == 1
+    assert len(model.entities) == 1
+    assert type(comp) == solph.Transformer
+    assert len(comp.inputs) == 1
+    assert len(comp.outputs) == 1

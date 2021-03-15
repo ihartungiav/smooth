@@ -76,13 +76,15 @@ class PowerConverter(Component):
 
         self.set_parameters(params)
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Transformer component using the information given in
         the PowerConverter class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
         :type busses: dict
-        :return: the oemof power_converter component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         power_converter = solph.Transformer(
             label=self.name,
@@ -91,4 +93,6 @@ class PowerConverter(Component):
                 nominal_value=self.output_power_max
             )},
             conversion_factors={busses[self.bus_output]: self.efficiency})
+
+        model.add(power_converter)
         return power_converter

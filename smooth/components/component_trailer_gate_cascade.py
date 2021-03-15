@@ -68,17 +68,21 @@ class TrailerGateCascade(Component):
         if self.fs_component_name is not None:
             self.max_input = self.get_foreign_state_value(components, index=0)
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Transformer component from the information given in the
         TrailerGateCascade class, to be used in the oemof model.
 
         :param busses: list of the virtual buses used in the energy system
         :type busses: list
-        :return: the 'trailer_gate_cascade' oemof component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         trailer_gate_cascade = solph.Transformer(
             label=self.name,
             inputs={busses[self.bus_in]: solph.Flow(nominal_value=self.max_input)},
             outputs={busses[self.bus_out]: solph.Flow()}
         )
+
+        model.add(trailer_gate_cascade)
         return trailer_gate_cascade

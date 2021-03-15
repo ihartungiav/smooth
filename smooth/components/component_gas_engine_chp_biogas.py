@@ -304,7 +304,7 @@ class GasEngineChpBiogas(Component):
         this_index = self.bp_bg_consumed_th_half.index(bg_consumption)
         return self.bp_energy_th[this_index]
 
-    def create_oemof_model(self, busses, model):
+    def add_to_oemof_model(self, busses, model):
         """Creates two separate oemof Piecewise Linear Transformer components for the
         electrical and thermal production of the biogas CHP from information given
         in the GasEngineChpBiogas class, to be used in the oemof model
@@ -314,7 +314,7 @@ class GasEngineChpBiogas(Component):
         :param model: oemof model containing the electrical energy production and
             thermal energy production of the biogas CHP
         :type model: model
-        :return: the oemof biogas CHP electric and thermal components
+        :return: tuple of electric and biogas oemof components
         """
         # Create the non-linear oemof component. The CHP has to be modelled as
         # two components, while the piecewise linear transformer does not
@@ -349,8 +349,7 @@ class GasEngineChpBiogas(Component):
 
         self.model_el = gas_engine_chp_biogas_electric
         self.model_th = gas_engine_chp_biogas_thermal
-
-        return None
+        return (gas_engine_chp_biogas_electric, gas_engine_chp_biogas_thermal)
 
     def update_constraints(self, busses, model_to_solve):
         """Set a constraint so that the biogas inflow of the electrical and
