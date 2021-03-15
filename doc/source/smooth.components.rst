@@ -18,7 +18,7 @@ In order to build a component, you must do the following:
 
 #. Define any other functions that are specific to your component.
 
-#. All components built in SMOOTH must be created as oemof components to be used in the oemof model (see `oemof-solph's component list <https://oemof-solph.readthedocs.io/en/latest/usage.html#solph-components>`_ to choose the best fitting component). Then create the oemof component in the :func:`create_oemof_model` function, defining all of the necessary parameters.
+#. All components built in SMOOTH must be created as oemof components to be used in the oemof model (see `oemof-solph's component list <https://oemof-solph.readthedocs.io/en/latest/usage.html#solph-components>`_ to choose the best fitting component). Then add the component to your oemof model using the :func:`add_to_oemof_model` function, defining all of the necessary parameters.
 
 #. If the states of the component need updating after each time step, specifiy these in the :func:`update_states` function. 
 
@@ -82,14 +82,6 @@ Component - The mother class of all components
    :undoc-members:
    :show-inheritance:
 
-AC-DC Converter
--------------------------------------------
-
-.. automodule:: smooth.components.component_ac_dc_converter
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Air Source Heat Pump
 -------------------------------------------
 
@@ -110,14 +102,6 @@ Compressor (Hydrogen)
 --------------------------------------------------
 
 .. automodule:: smooth.components.component_compressor_h2
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   
-DC-AC Inverter
----------------------------------------
-
-.. automodule:: smooth.components.component_dc_ac_inverter
    :members:
    :undoc-members:
    :show-inheritance:
@@ -201,6 +185,15 @@ PEM Electrolyzer
    :members:
    :undoc-members:
    :show-inheritance:
+
+Power Converter
+------------------------------------------------------------
+
+.. automodule:: smooth.components.component_power_converter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
    
 Sink
 ----------------------------------------
@@ -270,6 +263,14 @@ Trailer H2 Delivery Single
 ------------------------------------------
 
 .. automodule:: smooth.components.component_trailer_h2_delivery_single
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Variable Grid
+------------------------------------------
+
+.. automodule:: smooth.components.component_var_grid
    :members:
    :undoc-members:
    :show-inheritance:
