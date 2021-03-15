@@ -67,15 +67,16 @@ class TestBasic:
         assert b.p_in_max == 12  # div
         assert b.p_out_max == 24  # mult
 
-    def test_create_oemof_model(self):
+    def test_add_to_oemof_model(self):
         b = Battery({
             "bus_in_and_out": "foo",
             "sim_params": self.sim_params
         })
-        model = b.create_oemof_model({"foo": solph.Bus(label="foo")}, None)
-        assert type(model) == solph.components.GenericStorage
-        assert len(model.inputs) == 1
-        assert len(model.outputs) == 1
+        model = solph.EnergySystem()
+        component = b.add_to_oemof_model({"foo": solph.Bus(label="foo")}, model)
+        assert type(component) == solph.components.GenericStorage
+        assert len(component.inputs) == 1
+        assert len(component.outputs) == 1
 
 
 class TestUpdate:
@@ -100,14 +101,14 @@ class TestUpdate:
             "sim_params": self.sim_params
         })
         b1.prepare_simulation(None)
-        self.oemof_model.add(b1.create_oemof_model({"foo": bus}, None))
+        b1.add_to_oemof_model({"foo": bus}, self.oemof_model)
         b2 = Battery({
             "name": "bat2",
             "bus_in_and_out": "foo",
             "sim_params": self.sim_params
         })
         b2.prepare_simulation(None)
-        self.oemof_model.add(b2.create_oemof_model({"foo": bus}, None))
+        b2.add_to_oemof_model({"foo": bus}, self.oemof_model)
         model_to_solve = solph.Model(self.oemof_model)
         # solve model
         oemof_results = model_to_solve.solve(solver='cbc', solve_kwargs={'tee': False})
