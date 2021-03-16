@@ -110,13 +110,15 @@ class BiogasConverter(Component):
 
         self.conv = self.kwh_1m3_bg / self.heating_value_bg
 
-    def create_oemof_model(self, busses, _):
-        """Creates an oemof Source component from the information given in the
+    def add_to_oemof_model(self, busses, model):
+        """Creates an oemof Transformer component from the information given in the
         BiogasConverter class, to be used in the oemof model
 
-        :param busses: List of the virtual buses used in the energy system
-        :type busses: list
-        :return: 'biogas_converter' oemof component
+        :param busses: virtual buses used in the energy system
+        :type busses: dict
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         biogas_converter = solph.Transformer(
             label=self.name,
@@ -124,4 +126,5 @@ class BiogasConverter(Component):
             outputs={busses[self.bg_out]: solph.Flow()},
             conversion_factors={busses[self.bg_out]: self.conv}
         )
+        model.add(biogas_converter)
         return biogas_converter

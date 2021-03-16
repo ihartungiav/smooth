@@ -161,13 +161,15 @@ class BiogasSmrPsa(Component):
         self.smr_psa_eff = smr_eff * self.psa_eff
         self.energy_cnsmp_1kg_bg = (5.557 / bg_1kg_h2) * 1000
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Transformer component using the information given in
         the BiogasSteamReformer class, to be used in the oemof model
 
-        :param busses: virtual buses used in the energy system
+        :param busses: List of the virtual buses used in the energy system
         :type busses: list
-        :return: 'biogas steam reformer converter' oemof component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         biogas_smr_psa = solph.Transformer(
             label=self.name,
@@ -180,4 +182,5 @@ class BiogasSmrPsa(Component):
             conversion_factors={busses[self.bus_h2]: self.smr_psa_eff,
                                 busses[self.bus_el]: self.energy_cnsmp_1kg_bg}
                                 )
+        model.add(biogas_smr_psa)
         return biogas_smr_psa
