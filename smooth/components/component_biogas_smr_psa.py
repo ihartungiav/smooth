@@ -165,8 +165,8 @@ class BiogasSmrPsa(Component):
         """Creates an oemof Transformer component using the information given in
         the BiogasSteamReformer class, to be used in the oemof model
 
-        :param busses: List of the virtual buses used in the energy system
-        :type busses: list
+        :param busses: buses used in the energy system
+        :type busses: dict
         :param model: current oemof model
         :type model: oemof model
         :return: oemof component
