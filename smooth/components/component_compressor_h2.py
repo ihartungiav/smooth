@@ -91,11 +91,46 @@ electrical energy required to compress 1 kg of hydrogen:
 
 """
 
-
 import oemof.solph as solph
 from .component import Component
-from .component_functions.component_functions import calculate_compressibility_factor
 from math import log
+import numpy as np
+from scipy import interpolate
+
+
+def calculate_compressibility_factor(p_in, p_out, temp_in, temp_out):
+    """Calculates the compressibility factor through interpolation.
+
+    :param p_in: inlet pressure [bar]
+    :type p_in: numerical
+    :param p_out: outlet pressure [bar]
+    :type p_out: numerical
+    :param temp_in: inlet temperature of the hydrogen [K]
+    :type temp_in: numerical
+    :param temp_out: outlet temperature of the hydrogen [K]
+    :type temp_out: numerical
+    """
+    temp = np.transpose([200, 300, 400, 500, 600, 800, 1000, 2000])
+
+    p = [1, 10, 20, 40, 60, 80, 100, 200, 400, 600, 800, 1000]
+
+    z = [
+        [1.0007, 1.0066, 1.0134, 1.0275, 1.0422, 1.0575, 1.0734, 1.163, 1.355, 1.555, 1.753, 1.936],
+        [1.0005, 1.0059, 1.0117, 1.0236, 1.0357, 1.0479, 1.0603, 1.124, 1.253, 1.383, 1.510, 1.636],
+        [1.0004, 1.0048, 1.0096, 1.0192, 1.0289, 1.0386, 1.0484, 1.098, 1.196, 1.293, 1.388, 1.481],
+        [1.0004, 1.0040, 1.0080, 1.0160, 1.0240, 1.0320, 1.0400, 1.080, 1.159, 1.236, 1.311, 1.385],
+        [1.0003, 1.0034, 1.0068, 1.0136, 1.0204, 1.0272, 1.0340, 1.068, 1.133, 1.197, 1.259, 1.320],
+        [1.0002, 1.0026, 1.0052, 1.0104, 1.0156, 1.0208, 1.0259, 1.051, 1.100, 1.147, 1.193, 1.237],
+        [1.0002, 1.0021, 1.0042, 1.0084, 1.0126, 1.0168, 1.0209, 1.041, 1.080, 1.117, 1.153, 1.187],
+        [1.0009, 1.0013, 1.0023, 1.0044, 1.0065, 1.0086, 1.0107, 1.021, 1.040, 1.057, 1.073, 1.088],
+    ]
+
+    interp_func = interpolate.interp2d(p, temp, z)
+
+    z_in = interp_func(p_in, temp_in)
+    z_out = interp_func(p_out, temp_out)
+
+    return [z_in, z_out]
 
 
 class CompressorH2(Component):
@@ -105,31 +140,31 @@ class CompressorH2(Component):
     :param bus_h2_in: lower pressure hydrogen bus that is an input of
         the compressor
     :type bus_h2_in: str
+    :param bus_el: electricity bus that is an input of the compressor
+    :type bus_el: str
     :param bus_h2_out: higher pressure hydrogen bus that is the output
         of the compressor
     :type bus_h2_out: str
-    :param bus_el: electric bus that is an input of the compressor
-    :type bus_el: str
     :param m_flow_max: maximum mass flow through the compressor [kg/h]
-    :type m_flow_max: float
+    :type m_flow_max: numerical
     :param life_time: life time of the component [a]
-    :type life_time: float
+    :type life_time: numerical
     :param temp_in: temperature of hydrogen on entry to the compressor [K]
-    :type temp_in: float
-    :param efficiency: overall efficiency of the compressor
-    :type efficiency: float
+    :type temp_in: numerical
+    :param efficiency: overall efficiency of the compressor [-]
+    :type efficiency: numerical
     :param set_parameters(params): updates parameter default values
         (see generic Component class)
     :type set_parameters(params): function
     :param spec_compression_energy: specific compression energy
         (electrical energy needed per kg H2) [Wh/kg]
-    :type spec_compression_energy: int
+    :type spec_compression_energy: numerical
     :param R: gas constant (R) [J/(K*mol)]
-    :type R: float
+    :type R: numerical
     :param Mr_H2: molar mass of H2 [kg/mol]
-    :type Mr_H2: float
-    :param R_H2: ToDo: define this properly
-
+    :type Mr_H2: numerical
+    :param R_H2: specific gas constant for H2 [J/(K*kg)]
+    :type R_H2: numerical
     """
 
     def __init__(self, params):
@@ -145,8 +180,6 @@ class CompressorH2(Component):
         self.m_flow_max = 33.6
         self.life_time = 20
         # It is assumed that hydrogen always enters the compressor at room temperature [K]
-        # FIXME: An assumption from MATLAB is that hydrogen always enters the
-        # compressor at this temp, should it be calculated instead of assumed??
         self.temp_in = 293.15
         # value taken from MATLAB
         self.efficiency = 0.88829
@@ -164,13 +197,15 @@ class CompressorH2(Component):
         self.Mr_H2 = 2.016 * 1e-3
         self.R_H2 = self.R / self.Mr_H2
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Transformer component using the information given in
         the CompressorH2 class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
         :type busses: list
-        :return: the oemof compressor component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         compressor = solph.Transformer(
             label=self.name,
@@ -184,6 +219,7 @@ class CompressorH2(Component):
                 busses[self.bus_el]: self.spec_compression_energy,
                 busses[self.bus_h2_out]: 1})
 
+        model.add(compressor)
         return compressor
 
     def prepare_simulation(self, components):
@@ -233,7 +269,7 @@ class CompressorH2(Component):
                 ((((p_ratio) ** ((n - 1) / n))) - 1) *
                 real_gas) / 1000
 
-        # Convert specific compression work into electrical energy needed per kg H2 [Wh]
+        # Convert specific compression work into electrical energy needed per kg H2 [Wh/kg]
         self.spec_compression_energy = float(spec_compression_work / 3.6)
 
     def update_states(self, results):

@@ -187,14 +187,8 @@ def run_smooth(model):
         for this_comp in components:
             # Execute the prepare simulation step (if this component has one).
             this_comp.prepare_simulation(components)
-            # Get the oemof representation of this component.
-            this_oemof_model = this_comp.create_oemof_model(busses, oemof_model)
-            if this_oemof_model is not None:
-                # Add the component to the oemof model.
-                oemof_model.add(this_oemof_model)
-            else:
-                # If None is given back, no model is supposed to be added.
-                pass
+            # add oemof representation of this component to model
+            this_comp.add_to_oemof_model(busses, oemof_model)
 
         # ------------------- RUN THE SIMULATION -------------------
         # Do the simulation for this time step.
@@ -236,9 +230,9 @@ def run_smooth(model):
             # Update the states.
             this_comp.update_states(results)
             # Update the costs and artificial costs.
-            this_comp.update_var_costs(results)
+            this_comp.update_var_costs()
             # Update the costs and artificial costs.
-            this_comp.update_var_emissions(results)
+            this_comp.update_var_emissions()
 
     # Calculate the annuity for each component.
     for this_comp in components:

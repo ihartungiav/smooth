@@ -72,12 +72,9 @@ class TrailerGate(Component):
         # ------------------- STATES -------------------
         self.flow_switch = None
 
-    def update_var_costs(self, results):
+    def update_var_costs(self):
         """Calculates variable costs of the component which only applies if the
         trailer is used, based on the distance travelled by the trailer.
-
-        :param results: oemof results object for this timestep
-        :type results: object
         """
         # First create an empty cost and art. cost array for this component, if it hasn't been
         # created before.
@@ -133,13 +130,15 @@ class TrailerGate(Component):
             else:
                 self.max_input = 0
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Transformer component from the information given in the
         TrailerGate class, to be used in the oemof model.
 
         :param busses: list of the virtual buses used in the energy system
         :type busses: list
-        :return: the 'trailer_gate' oemof component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         trailer_gate = solph.Transformer(
             label=self.name,
@@ -147,4 +146,6 @@ class TrailerGate(Component):
                                                     nominal_value=self.max_input)},
             outputs={busses[self.bus_out]: solph.Flow()}
         )
+
+        model.add(trailer_gate)
         return trailer_gate

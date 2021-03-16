@@ -37,6 +37,7 @@ def plot_smooth_results(smooth_result, comp_label_dict=comp_dict_german,
 
     # Plot each bus in a new window.
     for this_bus in busses_to_plot:
+        plt.figure()
         for this_component, this_flow in busses_to_plot[this_bus].items():
             # get time axis (in hours, interval_time is in minutes)
             timeseries = [sim_params.interval_time/60 * t for t in range(len(this_flow))]
@@ -49,5 +50,4 @@ def plot_smooth_results(smooth_result, comp_label_dict=comp_dict_german,
         except KeyError:
             plt.title('bus: ' + this_bus)
             # no label for y axis
-
-        plt.show()
+    plt.show(block=False)
