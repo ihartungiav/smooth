@@ -315,7 +315,7 @@ class ElectrolyzerWasteHeat(Electrolyzer):
         ElectrolyserWasteHeat class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
+        :type busses: dict
         :param model: oemof model containing the hydrogen production and thermal energy
             production of the electrolyser
         :type model: model
@@ -472,7 +472,7 @@ class ElectrolyzerWasteHeat(Electrolyzer):
         separate components).
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
+        :type busses: dict
         :param model_to_solve: oemof model that will be solved
         :type model_to_solve: model
         """

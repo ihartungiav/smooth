@@ -232,8 +232,8 @@ class Battery(Component):
         """Creates an oemof Generic Storage component from the information given in
         the Battery class, to be used in the oemof model.
 
-        :param busses: List of the virtual buses used in the energy system
-        :type busses: list
+        :param busses: virtual buses used in the energy system
+        :type busses: dict
         :param model: current oemof model
         :type model: oemof model
         :return: oemof component

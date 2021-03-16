@@ -12,9 +12,10 @@ def test_init():
     assert s.name == "foo"
 
 
-def test_create_oemof_model():
+def test_add_to_oemof_model():
     s = Sink({"bus_in": "foo"})
-    model = s.create_oemof_model({"foo": solph.Bus(label="foo")}, None)
-    assert type(model) == solph.network.Sink
-    assert len(model.inputs) == 1
-    assert len(model.outputs) == 0
+    oemof_model = solph.EnergySystem()
+    component = s.add_to_oemof_model({"foo": solph.Bus(label="foo")}, oemof_model)
+    assert type(component) == solph.network.Sink
+    assert len(component.inputs) == 1
+    assert len(component.outputs) == 0

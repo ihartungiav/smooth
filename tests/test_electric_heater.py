@@ -3,23 +3,24 @@ import oemof.solph as solph
 
 
 def test_init():
-    acdc = ElectricHeater({})
+    heater = ElectricHeater({})
 
     params = {"power_max": 100}
-    acdc = ElectricHeater(params)
-    assert acdc.power_max == params["power_max"]
+    heater = ElectricHeater(params)
+    assert heater.power_max == params["power_max"]
 
 
-def test_create_oemof_model():
-    acdc = ElectricHeater({
+def test_add_to_oemof_model():
+    heater = ElectricHeater({
         "bus_th": "bus_el",
         "bus_el": "bus_th"
     })
-    model = acdc.create_oemof_model({
+    model = solph.EnergySystem()
+    component = heater.add_to_oemof_model({
         "bus_el": solph.Bus(label="bus_el"),
         "bus_th": solph.Bus(label="bus_th"),
-    }, None)
+    }, model)
 
-    assert type(model) == solph.Transformer
-    assert len(model.inputs) == 1
-    assert len(model.outputs) == 1
+    assert type(component) == solph.Transformer
+    assert len(component.inputs) == 1
+    assert len(component.outputs) == 1

@@ -10,7 +10,7 @@ class TestBasic:
         comp = PemElectrolyzer({})
         assert len(comp.bp_waste_heat_energy) > 0
 
-    def test_create_oemof_model(self):
+    def test_add_to_oemof_model(self):
         sim_params = SimulationParameters({})
         comp = PemElectrolyzer({
             "bus_h2": "bus1",
@@ -23,7 +23,7 @@ class TestBasic:
             timeindex=sim_params.date_time_index[0:1],
             freq='{}min'.format(sim_params.interval_time)
         )
-        comp.create_oemof_model({
+        comp.add_to_oemof_model({
             "bus1": solph.Bus(label="bus1"),
             "bus2": solph.Bus(label="bus2"),
             "bus3": solph.Bus(label="bus3")

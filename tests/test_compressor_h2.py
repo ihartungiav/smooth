@@ -13,7 +13,7 @@ class TestBasic:
         ch2 = CompressorH2({"m_flow_max": 50})
         assert ch2.m_flow_max == 50
 
-    def test_create_oemof_model(self):
+    def test_add_to_oemof_model(self):
         ch2 = CompressorH2({
             "bus_h2_in": "bus1",
             "bus_h2_out": "bus2",
@@ -21,14 +21,15 @@ class TestBasic:
             "sim_params": SimulationParameters({"interval_time": 15}),
             "m_flow_max": 60
         })
-        model = ch2.create_oemof_model({
+        oemof_model = solph.EnergySystem()
+        component = ch2.add_to_oemof_model({
             "bus1": solph.Bus(label="bus1"),
             "bus2": solph.Bus(label="bus2"),
             "bus3": solph.Bus(label="bus3"),
-        }, None)
-        assert type(model) == solph.Transformer
-        assert len(model.inputs) == 2
-        assert len(model.outputs) == 1
-        for k, v in model.inputs.items():
+        }, oemof_model)
+        assert type(component) == solph.Transformer
+        assert len(component.inputs) == 2
+        assert len(component.outputs) == 1
+        for k, v in component.inputs.items():
             if str(k) == "bus1":
                 assert v.nominal_value == 15

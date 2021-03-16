@@ -113,8 +113,8 @@ class Supply (Component):
         """Creates an oemof Source component from the information given in the Supply
         class, to be used in the oemof model.
 
-        :param busses: List of the virtual buses used in the energy system
-        :type busses: list
+        :param busses: virtual buses used in the energy system
+        :type busses: dict
         :param model: current oemof model
         :type model: oemof model
         :return: oemof component

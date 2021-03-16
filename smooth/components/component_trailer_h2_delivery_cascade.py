@@ -247,8 +247,8 @@ class TrailerH2DeliveryCascade(Component):
         """Creates an oemof Transformer component from the information given in the
         TrailerH2DeliveryCascade class, to be used in the oemof model.
 
-        :param busses: list of the virtual buses used in the energy system
-        :type busses: list
+        :param busses: virtual buses used in the energy system
+        :type busses: dict
         :param model: current oemof model
         :type model: oemof model
         :return: oemof component

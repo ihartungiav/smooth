@@ -25,7 +25,7 @@ class TestBasic:
         # todo: raise error if "None" is passed as csv_filename variable
         # todo: assert file is csv type
 
-    def test_create_oemof_model(self):
+    def test_add_to_oemof_model(self):
 
         test_path = os.path.join(os.path.dirname(__file__), 'test_timeseries')
         self.sim_params.i_interval = 0
@@ -34,8 +34,8 @@ class TestBasic:
                                       "csv_filename": "test_csv.csv",
                                       "path": test_path,
                                       "sim_params": self.sim_params})
-
-        model = demand.create_oemof_model({"foo": solph.Bus(label="foo")}, None)
-        assert type(model) == solph.network.Sink
-        assert len(model.inputs) == 1
-        assert len(model.outputs) == 0
+        oemof_model = solph.EnergySystem()
+        component = demand.add_to_oemof_model({"foo": solph.Bus(label="foo")}, oemof_model)
+        assert type(component) == solph.network.Sink
+        assert len(component.inputs) == 1
+        assert len(component.outputs) == 0

@@ -32,9 +32,9 @@ def test_prepare_simulation():
     assert s.current_ac == 4
 
 
-def test_create_oemof_model():
+def test_add_to_oemof_model():
     s = Supply({"bus_out": "foo"})
-    model = s.create_oemof_model({"foo": solph.Bus(label="foo")}, None)
+    model = s.add_to_oemof_model({"foo": solph.Bus(label="foo")}, solph.EnergySystem())
     assert type(model) == solph.network.Source
     assert len(model.inputs) == 0
     assert len(model.outputs) == 1

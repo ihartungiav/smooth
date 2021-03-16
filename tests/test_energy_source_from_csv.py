@@ -22,7 +22,7 @@ class TestBasic:
                                       "nominal_value": 2})
         assert source.nominal_value == 2
 
-    def test_create_oemof_model(self):
+    def test_add_to_oemof_model(self):
 
         test_path = os.path.join(os.path.dirname(__file__), 'test_timeseries')
         self.sim_params.i_interval = 0
@@ -31,8 +31,8 @@ class TestBasic:
                                       "csv_filename": "test_csv.csv",
                                       "path": test_path,
                                       "sim_params": self.sim_params})
-
-        model = source.create_oemof_model({"foo": solph.Bus(label="foo")}, None)
-        assert type(model) == solph.network.Source
-        assert len(model.inputs) == 0
-        assert len(model.outputs) == 1
+        oemof_model = solph.EnergySystem()
+        component = source.add_to_oemof_model({"foo": solph.Bus(label="foo")}, oemof_model)
+        assert type(component) == solph.network.Source
+        assert len(component.inputs) == 0
+        assert len(component.outputs) == 1

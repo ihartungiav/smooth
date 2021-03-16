@@ -57,6 +57,9 @@ def test_create_component_obj():
         if name == "air_source_heat_pump":
             # problem with oemof.thermal
             continue
+        if name == "var_grid":
+            comp["life_time"] = 1
+            continue
 
         try:
             func.create_component_obj({"components": {"comp": comp}}, sim_params)

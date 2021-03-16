@@ -50,18 +50,19 @@ class TestBasic:
         assert s.current_vac == [1, 2]
         assert s.delta_max == 100
 
-    def test_create_oemof_model(self):
+    def test_add_to_oemof_model(self):
         s = StorageH2({
           "bus_in": "foo",
           "bus_out": "bar",
           "sim_params": self.sim_params
         })
 
-        model = s.create_oemof_model({"foo": solph.Bus(label="foo"),
-                                      "bar": solph.Bus(label="bar")}, None)
-        assert type(model) == solph.components.GenericStorage
-        assert len(model.inputs) == 1
-        assert len(model.outputs) == 1
+        oemof_model = solph.EnergySystem()
+        component = s.add_to_oemof_model({"foo": solph.Bus(label="foo"),
+                                          "bar": solph.Bus(label="bar")}, oemof_model)
+        assert type(component) == solph.components.GenericStorage
+        assert len(component.inputs) == 1
+        assert len(component.outputs) == 1
 
 
 class TestUpdate:
@@ -86,10 +87,10 @@ class TestUpdate:
             "bus_out": "bus_out",
             "sim_params": self.sim_params
         })
-        storage_h2_model = s.create_oemof_model({
+        storage_h2_model = s.add_to_oemof_model({
             "bus_in": bus_in,
             "bus_out": bus_out
-        }, None)
+        }, self.oemof_model)
         self.oemof_model.add(storage_h2_model)
 
         model_to_solve = solph.Model(self.oemof_model)

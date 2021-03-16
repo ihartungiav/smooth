@@ -42,7 +42,7 @@ class TestBasic:
         for i in range(len(h2_cons_th)):
             assert h2_cons_th[i] == fc_chp.bp_h2_consumed_th[i]
 
-    def test_create_oemof_model(self):
+    def test_add_to_oemof_model(self):
         fc_chp = FuelCellChp({
             "bus_h2": "bus1",
             "bus_el": "bus2",
@@ -54,7 +54,7 @@ class TestBasic:
             timeindex=self.sim_params.date_time_index[0:1],
             freq='{}min'.format(self.sim_params.interval_time)
         )
-        fc_chp.create_oemof_model({
+        fc_chp.add_to_oemof_model({
             "bus1": solph.Bus(label="bus1"),
             "bus2": solph.Bus(label="bus2"),
             "bus3": solph.Bus(label="bus3")

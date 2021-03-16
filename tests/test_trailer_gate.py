@@ -7,12 +7,12 @@ def test_init():
     assert hasattr(gate, "driver_costs")
 
 
-def test_create_oemof_model():
+def test_add_to_oemof_model():
     gate = TrailerGate({
         "bus_in": "bus_in",
         "bus_out": "bus_out"
     })
-    comp = gate.create_oemof_model({
+    comp = gate.add_to_oemof_model({
         "bus_in": solph.Bus(label="bus_in"),
         "bus_out": solph.Bus(label="bus_out"),
     }, solph.EnergySystem())

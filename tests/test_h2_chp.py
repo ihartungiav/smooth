@@ -11,7 +11,7 @@ class TestBasic:
         comp = H2Chp({"sim_params": self.sim_params, "power_max": 1})
         assert comp.h2_input_max > 0
 
-    def test_create_oemof_model(self):
+    def test_add_to_oemof_model(self):
         h2_chp = H2Chp({
             "power_max": 1,
             "bus_h2": "bus1",
@@ -20,15 +20,15 @@ class TestBasic:
             "sim_params": self.sim_params
         })
 
-        model = solph.EnergySystem()
-        h2_chp.create_oemof_model({
+        oemof_model = solph.EnergySystem()
+        h2_chp.add_to_oemof_model({
             "bus1": solph.Bus(label="bus1"),
             "bus2": solph.Bus(label="bus2"),
             "bus3": solph.Bus(label="bus3")
-        }, model)
+        }, oemof_model)
         assert h2_chp.model_el is not None and h2_chp.model_th is not None
 
-        assert len(model.entities) == 2
+        assert len(oemof_model.entities) == 2
         assert type(h2_chp.model_el) == solph.custom.PiecewiseLinearTransformer
         assert type(h2_chp.model_th) == solph.custom.PiecewiseLinearTransformer
         assert len(h2_chp.model_el.inputs) == 1

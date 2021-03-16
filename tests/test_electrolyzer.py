@@ -13,19 +13,20 @@ class TestBasic:
         assert ely.energy_max == 50  # 100W, 30 minutes
         assert ely.max_production_per_step is not None
 
-    def test_create_oemof_model(self):
+    def test_add_to_oemof_model(self):
         ely = Electrolyzer({
             "bus_el": "bus1",
             "bus_h2": "bus2",
             "sim_params": self.sim_params
         })
-        model = ely.create_oemof_model({
+        oemof_model = solph.EnergySystem()
+        component = ely.add_to_oemof_model({
             "bus1": solph.Bus(label="bus1"),
             "bus2": solph.Bus(label="bus2")
-        }, None)
-        assert type(model) == solph.custom.PiecewiseLinearTransformer
-        assert len(model.inputs) == 1
-        assert len(model.outputs) == 1
+        }, oemof_model)
+        assert type(component) == solph.custom.PiecewiseLinearTransformer
+        assert len(component.inputs) == 1
+        assert len(component.outputs) == 1
 
     def test_update_non_linear_behaviour(self):
         ely = Electrolyzer({"sim_params": self.sim_params})
@@ -67,10 +68,10 @@ class TestUpdate:
             "bus_h2": "bus_h2",
             "sim_params": self.sim_params
         })
-        ely_model = ely.create_oemof_model({
+        ely_model = ely.add_to_oemof_model({
             "bus_el": bus_el,
             "bus_h2": bus_h2
-        }, None)
+        }, self.oemof_model)
         self.oemof_model.add(ely_model)
 
         model_to_solve = solph.Model(self.oemof_model)

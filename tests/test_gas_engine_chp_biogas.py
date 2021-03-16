@@ -20,7 +20,7 @@ class TestBasic:
                 "co2_share": 0
             })
 
-    def test_create_oemof_model(self):
+    def test_add_to_oemof_model(self):
         comp = GasEngineChpBiogas({
             "power_max": 1,
             "bus_bg": "bus1",
@@ -33,7 +33,7 @@ class TestBasic:
             timeindex=self.sim_params.date_time_index[0:1],
             freq='{}min'.format(self.sim_params.interval_time)
         )
-        comp.create_oemof_model({
+        comp.add_to_oemof_model({
             "bus1": solph.Bus(label="bus1"),
             "bus2": solph.Bus(label="bus2"),
             "bus3": solph.Bus(label="bus3")

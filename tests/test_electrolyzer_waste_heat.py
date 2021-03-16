@@ -21,7 +21,7 @@ class TestBasic:
         assert ely.energy_max == 50  # 100W, 30 minutes
         assert ely.area_separator is not None
 
-    def test_create_oemof_model(self):
+    def test_add_to_oemof_model(self):
         ely = ElectrolyzerWasteHeat({
             "bus_el": "bus1",
             "bus_h2": "bus2",
@@ -32,7 +32,7 @@ class TestBasic:
             timeindex=self.sim_params.date_time_index[0:1],
             freq='{}min'.format(self.sim_params.interval_time)
         )
-        ely.create_oemof_model({
+        ely.add_to_oemof_model({
             "bus1": solph.Bus(label="bus1"),
             "bus2": solph.Bus(label="bus2"),
             "bus3": solph.Bus(label="bus3")
@@ -89,7 +89,7 @@ class TestUpdate:
             "bus_th": "bus_th",
             "sim_params": self.sim_params
         })
-        ely.create_oemof_model({
+        ely.add_to_oemof_model({
             "bus_el": bus_el,
             "bus_h2": bus_h2,
             "bus_th": bus_th

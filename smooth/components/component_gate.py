@@ -67,7 +67,7 @@ class Gate(Component):
         the Gate class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
+        :type busses: dict
         :param model: current oemof model
         :type model: oemof model
         :return: oemof component

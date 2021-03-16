@@ -24,7 +24,7 @@ class TestBasic:
         })
         assert sts.temp_env != 0 and len(sts.temp_env) > 0
 
-    def test_create_oemof_model(self):
+    def test_add_to_oemof_model(self):
 
         sts = StratifiedThermalStorage({
             "bus_in": "bus1",
@@ -34,10 +34,11 @@ class TestBasic:
 
         sts.sim_params.i_interval = 0
 
-        comp = sts.create_oemof_model({
+        oemof_model = solph.EnergySystem()
+        component = sts.add_to_oemof_model({
             "bus1": solph.Bus(label="bus1"),
             "bus2": solph.Bus(label="bus2")
-        }, solph.EnergySystem())
-        assert type(comp) == solph.components.GenericStorage
-        assert len(comp.inputs) == 1
-        assert len(comp.outputs) == 1
+        }, oemof_model)
+        assert type(component) == solph.components.GenericStorage
+        assert len(component.inputs) == 1
+        assert len(component.outputs) == 1

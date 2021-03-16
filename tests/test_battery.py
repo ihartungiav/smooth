@@ -72,8 +72,8 @@ class TestBasic:
             "bus_in_and_out": "foo",
             "sim_params": self.sim_params
         })
-        model = solph.EnergySystem()
-        component = b.add_to_oemof_model({"foo": solph.Bus(label="foo")}, model)
+        oemof_model = solph.EnergySystem()
+        component = b.add_to_oemof_model({"foo": solph.Bus(label="foo")}, oemof_model)
         assert type(component) == solph.components.GenericStorage
         assert len(component.inputs) == 1
         assert len(component.outputs) == 1

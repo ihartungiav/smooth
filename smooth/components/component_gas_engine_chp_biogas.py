@@ -310,7 +310,7 @@ class GasEngineChpBiogas(Component):
         in the GasEngineChpBiogas class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
+        :type busses: dict
         :param model: oemof model containing the electrical energy production and
             thermal energy production of the biogas CHP
         :type model: model
