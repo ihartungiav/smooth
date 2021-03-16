@@ -106,6 +106,22 @@ Battery
    :undoc-members:
    :show-inheritance:
 
+Biogas Converter
+-------------------------------------------
+
+.. automodule:: smooth.components.component_biogas_converter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Biogas Steam Methane Reformer with Pressure Swing Adsorption
+-------------------------------------------
+
+.. automodule:: smooth.components.component_biogas_smr_psa
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Compressor (Hydrogen)
 --------------------------------------------------
 

@@ -136,7 +136,8 @@ components.append({
 })
 
 # Compressor (40-300 bar)
-# The maximum mass flow rate ('m_flow_max') parameter will be optimized in the optimization
+# The maximum mass flow rate ('m_flow_max') parameter
+# will be optimized in the optimization
 components.append({
     'component': 'compressor_h2',
     'name': 'h2_compressor',

@@ -65,8 +65,8 @@ class BiogasConverter(Component):
     :type co2_share: numerical
     :param kwh_1m3_bg: energy content in 1m3 biogas [kWh/m3]
     :type kwh_1m3_bg: numerical
-    :param set_parameters(params): updates parameter default values (see generic Component
-        class)
+    :param set_parameters(params): updates parameter default values
+        (see generic Component class)
     :type set_parameters(params): function
     :param mol_mass_ch4: molar mass of methane [kg/mol]
     :type mol_mass_ch4: numerical
@@ -102,9 +102,11 @@ class BiogasConverter(Component):
         self.mol_mass_co2 = 0.04401  # [kg/mol]
         self.heating_value_ch4 = 13.9
 
-        self.heating_value_bg = ((self.ch4_share * self.mol_mass_ch4) /
-                                 ((self.ch4_share * self.mol_mass_ch4) +
-                                  (self.co2_share * self.mol_mass_co2))) * self.heating_value_ch4
+        self.heating_value_bg = (
+                                        (self.ch4_share * self.mol_mass_ch4) /
+                                        ((self.ch4_share * self.mol_mass_ch4)
+                                         + (self.co2_share * self.mol_mass_co2))
+                                ) * self.heating_value_ch4
 
         self.conv = self.kwh_1m3_bg / self.heating_value_bg
 

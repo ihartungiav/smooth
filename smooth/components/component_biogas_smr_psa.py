@@ -91,7 +91,6 @@ Wasserstoffreinigung Rückgewinnung und Reinigung von Wasserstoff durch PSA.
 
 from smooth.components.component import Component
 import oemof.solph as solph
-import pyomo.environ as po
 
 
 class BiogasSmrPsa(Component):
