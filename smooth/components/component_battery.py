@@ -37,7 +37,7 @@ the system to maintain the wanted storage level.
 
 Maximum chargeable/dischargeable energy
 ---------------------------------------
-The maximum power [W] going in to or out of the battery are dependant on
+The maximum power [W] going in to or out of the battery are dependent on
 the C-rate and the capacity:
 
 .. math::
@@ -58,8 +58,8 @@ the C-rate and the capacity:
 
     Fig.2: Diagram of the battery component including losses.
 
-The amount of energy, that the battery will be charged or discharged
-includes the energy losses during the (dis-)charging process:
+The amount of energy that the battery will be charged or discharged
+takes the energy losses during the (dis-)charging process into account:
 
 .. math::
     P_{charge,max} = P_{in,max} \\cdot \\mu_{charge}
