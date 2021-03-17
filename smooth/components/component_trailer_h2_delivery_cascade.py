@@ -243,16 +243,20 @@ class TrailerH2DeliveryCascade(Component):
 
         self.current_ac = self.get_costs_and_art_costs()
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Transformer component from the information given in the
         TrailerH2DeliveryCascade class, to be used in the oemof model.
 
         :param busses: list of the virtual buses used in the energy system
         :type busses: list
-        :return: the 'trailer_cascade' oemof component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         trailer_cascade = solph.Transformer(
             label=self.name,
             outputs={busses[self.bus_out]: solph.Flow(variable_costs=self.current_ac)},
             inputs={busses[self.bus_in]: solph.Flow(nominal_value=self.hydrogen_needed)})
+
+        model.add(trailer_cascade)
         return trailer_cascade

@@ -109,13 +109,15 @@ class Supply (Component):
         # (costs + art.  costs) e.g. [EUR/Wh], [EUR/kg].
         self.current_ac = self.get_costs_and_art_costs()
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Source component from the information given in the Supply
         class, to be used in the oemof model.
 
         :param busses: List of the virtual buses used in the energy system
         :type busses: list
-        :return: 'from_grid' oemof component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         from_grid = solph.Source(
             label=self.name,
@@ -123,4 +125,6 @@ class Supply (Component):
                 nominal_value=self.output_max,
                 variable_costs=self.current_ac
             )})
+
+        model.add(from_grid)
         return from_grid

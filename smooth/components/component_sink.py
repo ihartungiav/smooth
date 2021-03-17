@@ -55,13 +55,15 @@ class Sink(Component):
         # ------------------- COSTS -------------------
         self.commodity_costs = self.get_costs_and_art_costs()
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Sink component from the information given in the Sink
         class, to be used in the oemof model.
 
         :param busses: List of the virtual buses used in the energy system
         :type busses: list
-        :return: 'sink' oemof component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         sink = solph.Sink(
             label=self.name,
@@ -69,4 +71,6 @@ class Sink(Component):
                 variable_costs=self.commodity_costs,
                 nominal_value=self.input_max
             )})
+
+        model.add(sink)
         return sink

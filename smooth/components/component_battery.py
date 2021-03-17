@@ -230,13 +230,15 @@ class Battery(Component):
         self.p_in_max = self.c_rate_charge * self.battery_capacity
         self.p_out_max = self.c_rate_discharge * self.battery_capacity
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Generic Storage component from the information given in
         the Battery class, to be used in the oemof model.
 
         :param busses: List of the virtual buses used in the energy system
         :type busses: list
-        :return: The 'battery' oemof component
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         battery = solph.components.GenericStorage(
             label=self.name,
@@ -254,6 +256,7 @@ class Battery(Component):
             outflow_conversion_factor=self.efficiency_discharge,
             balanced=False,
         )
+        model.add(battery)
         return battery
 
     def update_states(self, results):

@@ -34,9 +34,11 @@ def test_prepare_simulation():
     assert vg.current_ac == 4 + 0.5
 
 
-def test_create_oemof_model():
+def test_add_to_oemof_model():
     vg = VarGrid({"bus_out": "foo"})
-    model = vg.create_oemof_model({"foo": solph.Bus(label="foo")}, None)
-    assert type(model) == solph.network.Source
-    assert len(model.inputs) == 0
-    assert len(model.outputs) == 1
+    model = solph.EnergySystem()
+    comp = vg.add_to_oemof_model({"foo": solph.Bus(label="foo")}, model)
+    assert len(model.entities) == 1
+    assert type(comp) == solph.network.Source
+    assert len(comp.inputs) == 0
+    assert len(comp.outputs) == 1
