@@ -204,12 +204,9 @@ class Battery(Component):
 
     def prepare_simulation(self, components):
         """Prepares the simulation by setting the appropriate artificial costs
-        and the maximum chargeable or dischargeable energy into/out of the
-        battery.
 
-        :param components: List containing each component object
+        :param components: List containing each component object (unused in this component)
         :type components: list
-        :return: artificial costs and maximum chargeable or dischargeable energy
         """
         # Set the var. art. costs.
         vac_in = self.vac_in
