@@ -195,6 +195,14 @@ class TestGA:
             for gene in ch:
                 assert gene == 0 or gene == 4 or gene == 8
 
+        # mutation has to change values
+        for _ in range(1000):
+            ch = opt.mutate(pa, av)
+            if pa.values != ch.values:
+                break
+        else:
+            raise Exception("Quantized values are not changed")
+
     def test_fitness(self):
         idx = 1
         ind = opt.Individual([1])
