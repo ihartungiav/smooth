@@ -162,7 +162,7 @@ class FuelCellChp(Component):
         self.bus_el = None
         self.bus_th = None
         # Max. electrical output power [W].
-        self.power_max = None
+        self.power_max = 1000
         # Lifetime of the component [a]
         self.life_time = 15
         # Update the input parameters by the user.
@@ -248,7 +248,7 @@ class FuelCellChp(Component):
         in the FuelCellCHP class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
+        :type busses: dict
         :param model: oemof model containing the electrical energy production and
             thermal energy production of the fuel cell CHP
         :type model: model
@@ -294,7 +294,7 @@ class FuelCellChp(Component):
         therefore the two parts need to be separate components).
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
+        :type busses: dict
         :param model_to_solve: The oemof model that will be solved
         :type model_to_solve: model
         """

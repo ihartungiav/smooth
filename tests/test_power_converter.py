@@ -15,13 +15,13 @@ def test_add_to_oemof_model():
         "bus_input": "bus_input",
         "bus_output": "bus_output"
     })
-    model = solph.EnergySystem()
-    comp = power_converter.add_to_oemof_model({
+    oemof_model = solph.EnergySystem()
+    component = power_converter.add_to_oemof_model({
         "bus_input": solph.Bus(label="bus_input"),
         "bus_output": solph.Bus(label="bus_output"),
-    }, model)
+    }, oemof_model)
 
-    assert len(model.entities) == 1
-    assert type(comp) == solph.Transformer
-    assert len(comp.inputs) == 1
-    assert len(comp.outputs) == 1
+    assert len(oemof_model.entities) == 1
+    assert type(component) == solph.Transformer
+    assert len(component.inputs) == 1
+    assert len(component.outputs) == 1

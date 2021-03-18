@@ -181,7 +181,7 @@ class H2Chp(Component):
         because the piecewise linear transformer does not accept 2 outputs yet.
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
+        :type busses: dict
         :param model: current oemof model
         :type model: oemof model
         :return: tuple of electric and thermal oemof components

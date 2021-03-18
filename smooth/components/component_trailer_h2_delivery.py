@@ -224,8 +224,8 @@ class TrailerH2Delivery(Component):
         """Creates an oemof Transformer component from the information given in the
         TrailerH2Delivery class, to be used in the oemof model.
 
-        :param busses: list of the virtual buses used in the energy system
-        :type busses: list
+        :param busses: virtual buses used in the energy system
+        :type busses: dict
         :param model: current oemof model
         :type model: oemof model
         :return: oemof component

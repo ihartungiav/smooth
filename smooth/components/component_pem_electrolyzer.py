@@ -251,7 +251,7 @@ class PemElectrolyzer(Component):
         given in the PEMElectrolyzer class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
+        :type busses: dict
         :param model: oemof model containing the hydrogen production and
             waste heat production of the PEM electrolyzer
         :type model: model
