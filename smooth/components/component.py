@@ -166,8 +166,8 @@ class Component:
         which can be written here. Else, this function is used as placeholder for
         components without constraints.
 
-        :param busses: List of the virtual buses used in the energy system
-        :type busses: list
+        :param busses: Dict of the virtual buses used in the energy system
+        :type busses: dict
         :param model_to_solve: ToDo: look this up in oemof
         :type model_to_solve:
         :return: If used as a placeholder, nothing will be returned. Else, refer
