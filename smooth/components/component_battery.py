@@ -194,8 +194,9 @@ class Battery(Component):
 
         # ------------------- STATES -------------------
         self.soc = self.soc_init
-        self.p_in_max = None
-        self.p_out_max = None
+        # The in- / and outflow of power are calculated using the battery capacity and the C-rate
+        self.p_in_max = self.c_rate_charge * self.battery_capacity
+        self.p_out_max = self.c_rate_discharge * self.battery_capacity
         self.loss_rate = (self.loss_rate / 24) * (self.sim_params.interval_time / 60)
 
         # ------------------- VARIABLE ARTIFICIAL COSTS -------------------
@@ -226,9 +227,6 @@ class Battery(Component):
 
         # ToDo: c_rate depending on the soc
 
-        # The in- / and outflow of power are calculated using the battery capacity and the C-rate
-        self.p_in_max = self.c_rate_charge * self.battery_capacity
-        self.p_out_max = self.c_rate_discharge * self.battery_capacity
 
     def add_to_oemof_model(self, busses, model):
         """Creates an oemof Generic Storage component from the information given in
