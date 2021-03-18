@@ -192,7 +192,7 @@ class Battery(Component):
             self.c_rate_charge = self.c_rate_symm
             self.c_rate_discharge = self.c_rate_symm
 
-        # ------------------- STATES -------------------
+        # ------------------- STATES AND DERIVED PROPERTIES -------------------
         self.soc = self.soc_init
         # The in- / and outflow of power are calculated using the battery capacity and the C-rate
         self.p_in_max = self.c_rate_charge * self.battery_capacity
@@ -226,7 +226,6 @@ class Battery(Component):
         # ToDo: efficiency depending on the soc
 
         # ToDo: c_rate depending on the soc
-
 
     def add_to_oemof_model(self, busses, model):
         """Creates an oemof Generic Storage component from the information given in
