@@ -64,8 +64,8 @@ class TestBasic:
             "sim_params": self.sim_params
         })
         b.prepare_simulation(None)
-        assert b.p_in_max == 12  # div
-        assert b.p_out_max == 24  # mult
+        assert b.p_in_max == 12
+        assert b.p_out_max == 12
 
     def test_add_to_oemof_model(self):
         b = Battery({
