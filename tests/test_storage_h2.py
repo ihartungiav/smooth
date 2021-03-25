@@ -1,7 +1,6 @@
 from smooth.components.component_storage_h2 import StorageH2
 from smooth.framework.simulation_parameters import SimulationParameters
 import oemof.solph as solph
-from oemof.outputlib import processing
 
 
 class TestBasic:
@@ -97,8 +96,8 @@ class TestUpdate:
 
         # solve model
         oemof_results = model_to_solve.solve(solver='cbc', solve_kwargs={'tee': False})
-        assert oemof_results["Solver"][0]["Status"].key == "ok"
-        results = processing.results(model_to_solve)
+        assert oemof_results["Solver"][0]["Status"].value == "ok"
+        results = solph.processing.results(model_to_solve)
         assert results is not None
 
         # update storage states

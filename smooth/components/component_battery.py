@@ -264,7 +264,7 @@ class Battery(Component):
 
         # Loop Through the data frame values and update states accordingly.
         for i_result in df_storage:
-            if i_result[1] == "capacity":
+            if i_result[1] == "storage_content":
                 if "soc" not in self.states:
                     # Initialize a.n array that tracks the state SoC
                     self.states["soc"] = [None] * self.sim_params.n_intervals

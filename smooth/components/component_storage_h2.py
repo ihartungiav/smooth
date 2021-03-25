@@ -289,7 +289,7 @@ class StorageH2 (Component):
 
         # Loop Through the data frame values and update states accordingly.
         for i_result in df_storage:
-            if i_result[1] == 'capacity':
+            if i_result[1] == 'storage_content':
                 if 'storage_level' not in self.states:
                     # Initialize an array that tracks the state stored mass.
                     self.states['storage_level'] = [None] * self.sim_params.n_intervals

@@ -89,8 +89,7 @@ class EnergyDemandFromCsv(Component):
             label=self.name,
             inputs={busses[self.bus_in]: solph.Flow(
                 fix=self.data.iloc[self.sim_params.i_interval],
-                nominal_value=self.nominal_value,
-                fixed=True)})
+                nominal_value=self.nominal_value)})
 
         model.add(energy_demand_from_csv)
 

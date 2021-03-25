@@ -1,7 +1,6 @@
 from smooth.components.component_battery import Battery
 from smooth.framework.simulation_parameters import SimulationParameters
 import oemof.solph as solph
-from oemof.outputlib import processing
 
 import pytest
 
@@ -19,7 +18,7 @@ class TestBasic:
         with pytest.raises(ValueError):
             b = Battery({
                 "soc_init": 0,
-                "soc_min": 10
+                "soc_min": 0.1
             })
 
         # loss rate per day
@@ -48,8 +47,8 @@ class TestBasic:
             "vac_low_out": 2,
             "vac_in": 3,
             "vac_out": 4,
-            "soc_wanted": 100,
-            "soc_init": 50,
+            "soc_wanted": 1,
+            "soc_init": 0.5,
             "sim_params": self.sim_params
         })
         b.prepare_simulation(None)
@@ -112,8 +111,8 @@ class TestUpdate:
         model_to_solve = solph.Model(self.oemof_model)
         # solve model
         oemof_results = model_to_solve.solve(solver='cbc', solve_kwargs={'tee': False})
-        assert oemof_results["Solver"][0]["Status"].key == "ok"
-        results = processing.results(model_to_solve)
+        assert oemof_results["Solver"][0]["Status"].value == "ok"
+        results = solph.processing.results(model_to_solve)
         assert results is not None
 
         # update battery states
@@ -131,5 +130,5 @@ class TestUpdate:
             assert battery.soc > battery.soc_min
 
         # check loss rate
-        assert b1.soc == 0.5
+        assert b1.soc == 0.5  # todo: Fail, but why??
         assert b2.soc == b2.soc_init
