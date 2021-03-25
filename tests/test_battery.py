@@ -24,9 +24,9 @@ class TestBasic:
         # loss rate per day
         b = Battery({
             "sim_params": self.sim_params,
-            "loss_rate": 24  # 1% per hour
+            "loss_rate": 12  # 50% per hour
         })
-        assert b.loss_rate == 0.5  # 0.5 per timestep (half hour)
+        assert b.loss_rate == 0.5
 
     def test_prepare_simulation(self):
         b = Battery({
@@ -80,7 +80,7 @@ class TestBasic:
 
 class TestUpdate:
 
-    sim_params = SimulationParameters({"interval_time": 30, "n_intervals": 2})
+    sim_params = SimulationParameters({"interval_time": 60, "n_intervals": 2})
     sim_params.i_interval = 0
     oemof_model = solph.EnergySystem(
         timeindex=sim_params.date_time_index[0:1],
@@ -96,7 +96,7 @@ class TestUpdate:
             "name": "bat1",
             "bus_in_and_out": "foo",
             "soc_init": 1,
-            "loss_rate": 24,  # 1/h -> 0.5 per interval
+            "loss_rate": 12,  # 0.5/h
             "sim_params": self.sim_params
         })
         b1.prepare_simulation(None)

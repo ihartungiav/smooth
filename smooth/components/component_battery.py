@@ -196,7 +196,7 @@ class Battery(Component):
         # The in- / and outflow of power are calculated using the battery capacity and the C-rate
         self.p_in_max = self.c_rate_charge * self.battery_capacity
         self.p_out_max = self.c_rate_discharge * self.battery_capacity
-        self.loss_rate = (self.loss_rate / 24) * (self.sim_params.interval_time / 60)
+        self.loss_rate = (self.loss_rate / 24)  # oemof calculates loss rate per hour
 
         # ------------------- VARIABLE ARTIFICIAL COSTS -------------------
         self.current_vac = [0, 0]
