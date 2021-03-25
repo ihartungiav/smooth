@@ -253,13 +253,15 @@ class StorageH2 (Component):
         self.current_vac = [vac_in, vac_out]
         self.delta_max = self.storage_capacity
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Generic Storage component from the information given in
         the StorageH2 class, to be used in the oemof model.
 
-        :param busses: List of the virtual buses used in the energy system
-        :type busses: list
-        :return: The 'storage' oemof component
+        :param busses: virtual buses used in the energy system
+        :type busses: dict
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         storage = solph.components.GenericStorage(
             label=self.name,
@@ -271,6 +273,8 @@ class StorageH2 (Component):
             nominal_storage_capacity=self.storage_capacity,
             min_storage_level=self.storage_level_min / self.storage_capacity,
             balanced=False)
+
+        model.add(storage)
         return storage
 
     def update_states(self, results):

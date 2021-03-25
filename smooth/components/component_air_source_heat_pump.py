@@ -157,13 +157,15 @@ class AirSourceHeatPump(Component):
             # self.consider_icing,
             self.factor_icing)
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Transformer component from information given in
         the AirSourceHeatPump class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
-        :return: oemof 'air_source_heat_pump' component
+        :type busses: dict
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         air_source_heat_pump = solph.Transformer(
             label=self.name,
@@ -173,4 +175,6 @@ class AirSourceHeatPump(Component):
                 variable_costs=0)},
             conversion_factors={busses[self.bus_th]: self.cops[self.sim_params.i_interval]}
         )
+
+        model.add(air_source_heat_pump)
         return air_source_heat_pump

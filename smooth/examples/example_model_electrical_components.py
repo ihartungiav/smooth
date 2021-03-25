@@ -2,15 +2,15 @@
 This example represents a simple electric energy system model definition.
 
 1. The virtual busses to be used in the system are defined as a list. In this
-example,
-an AC current electricity bus (*bel_ac*),
+example, an AC current electricity bus with medium voltage (*bel_ac_mv_grid*),
+an AC current electricity bus with low voltage (*bel_ac_lv_grid*),
 a DC current electricity bus connected to the battery (*bel_dc_bat*),
 a DC current electricity bus connected to the PV system (*bel_dc_pv*),
 and a thermal bus (*bth*) are used.
 
 .. code:: bash
 
-    busses = ['bel_ac', 'bel_dc_bat', 'bel_dc_pv', 'bth']
+    busses = ['bel_ac_mv_grid', 'bel_ac_lv_grid', 'bel_dc_bat', 'bel_dc_pv', 'bth']
 
 2. The components are created in a list. An example of a component being
 added to the list is as follows:
@@ -20,7 +20,7 @@ added to the list is as follows:
     components.append({
         'component': 'supply',
         'name': 'from_grid',
-        'bus_out': 'bel_ac',
+        'bus_out': 'bel_ac_mv_grid',
         'output_max': 950 * 1e3,
         'variable_costs': 0.16 / 1000,
         'dependency_flow_costs': ('from_grid', 'bel_ac_mv_grid'),
@@ -59,27 +59,36 @@ import os
 my_path = os.path.join(os.path.dirname(__file__), 'example_timeseries')
 
 # Create busses list
-busses = ['bel_ac', 'bel_dc_bat', 'bel_dc_pv', 'bth']
+busses = ['bel_ac_mv_grid', 'bel_ac_lv_grid', 'bel_dc_bat', 'bel_dc_pv', 'bth']
 
 # Define components list
 components = list()
 components.append({
     'component': 'supply',
     'name': 'from_grid',
-    'bus_out': 'bel_ac',
+    'bus_out': 'bel_ac_mv_grid',
     'output_max': 950 * 1e3,
     'variable_costs': 0.16 / 1000,
-    'dependency_flow_costs': ('from_grid', 'bel_ac'),
+    'dependency_flow_costs': ('from_grid', 'bel_ac_mv_grid'),
     'life_time': 50,
 })
 
 components.append({
     'component': 'sink',
     'name': 'to_grid',
-    'bus_in': 'bel_ac',
+    'bus_in': 'bel_ac_mv_grid',
     'artificial_costs': 10,
     'input_max': 1 * 1e6,
-    'dependency_flow_costs': ('bel_ac', 'to_grid'),
+    'dependency_flow_costs': ('bel_ac_mv_grid', 'to_grid'),
+})
+
+components.append({
+    'component': 'power_converter',
+    'name': 'local_transformer_station',
+    'bus_input': 'bel_ac_mv_grid',
+    'bus_output': 'bel_ac_lv_grid',
+    'output_power_max': 1 * 1e6,
+    'efficiency': 0.98,
 })
 
 components.append({
@@ -94,10 +103,10 @@ components.append({
 })
 
 components.append({
-    'component': 'dc_ac_inverter',
+    'component': 'power_converter',
     'name': 'dc_ac_inverter_pv',
-    'bus_el_dc': 'bel_dc_pv',
-    'bus_el_ac': 'bel_ac',
+    'bus_input': 'bel_dc_pv',
+    'bus_output': 'bel_ac_lv_grid',
     'output_power_max': 800000,
     'efficiency': 0.98,
 })
@@ -105,7 +114,7 @@ components.append({
 components.append({
     'component': 'energy_demand_from_csv',
     'name': 'ac_lv_demand',
-    'bus_in': 'bel_ac',
+    'bus_in': 'bel_ac_lv_grid',
     'csv_filename': 'ts_oemof_test_input_data.csv',
     'csv_separator': ',',
     'nominal_value': 1000000,
@@ -140,19 +149,19 @@ components.append({
 })
 
 components.append({
-    'component': 'ac_dc_converter',
-    'name': 'ac_dc_converter_bat_in',
-    'bus_el_ac': 'bel_ac',
-    'bus_el_dc': 'bel_dc_bat',
+    'component': 'power_converter',
+    'name': 'ac_dc_inverter_bat_in',
+    'bus_input': 'bel_ac_lv_grid',
+    'bus_output': 'bel_dc_bat',
     'output_power_max': 800000,
     'efficiency': 0.98,
 })
 
 components.append({
-    'component': 'dc_ac_inverter',
+    'component': 'power_converter',
     'name': 'dc_ac_inverter_bat_out',
-    'bus_el_dc': 'bel_dc_bat',
-    'bus_el_ac': 'bel_ac',
+    'bus_input': 'bel_dc_bat',
+    'bus_output': 'bel_ac_lv_grid',
     'output_power_max': 1000000,
     'efficiency': 0.98,
 })
@@ -160,7 +169,7 @@ components.append({
 components.append({
     'component': 'electric_heater',
     'name': 'Electric_heater',
-    'bus_el': 'bel_ac',
+    'bus_el': 'bel_ac_lv_grid',
     'bus_th': 'bth',
     'power_max': 10000000,
     'efficiency': 0.98,

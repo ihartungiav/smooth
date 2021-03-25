@@ -75,18 +75,23 @@ class EnergyDemandFromCsv(Component):
         self.data = func.read_data_file(self.path, self.csv_filename,
                                         self.csv_separator, self.column_title)
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Sink component from the information given in the
         EnergyDemandFromCSV class, to be used in the oemof model.
 
-        :param busses: List of the virtual buses used in the energy system
-        :type busses: list
-        :return: The 'energy_demand_from_csv' oemof component
+        :param busses: virtual buses used in the energy system
+        :type busses: dict
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         energy_demand_from_csv = solph.Sink(
             label=self.name,
             inputs={busses[self.bus_in]: solph.Flow(
                 fix=self.data.iloc[self.sim_params.i_interval],
                 nominal_value=self.nominal_value,
-            )})
+                fixed=True)})
+
+        model.add(energy_demand_from_csv)
+
         return energy_demand_from_csv

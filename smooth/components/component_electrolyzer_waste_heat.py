@@ -309,13 +309,13 @@ class ElectrolyzerWasteHeat(Electrolyzer):
         # Return the according hydrogen production value [kg].
         return self.supporting_points["thermal_energy"][this_index]
 
-    def create_oemof_model(self, busses, model):
+    def add_to_oemof_model(self, busses, model):
         """Creates two separate oemof Piecewise Linear Transformer components for the hydrogen
         and thermal production of the electrolyser from information given in the
         ElectrolyserWasteHeat class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
+        :type busses: dict
         :param model: oemof model containing the hydrogen production and thermal energy
             production of the electrolyser
         :type model: model
@@ -357,8 +357,7 @@ class ElectrolyzerWasteHeat(Electrolyzer):
 
         self.model_h2 = electrolyzer
         self.model_th = electrolyzer_thermal
-
-        return None
+        return (electrolyzer, electrolyzer_thermal)
 
     def update_nonlinear_behaviour(self):
         """Updates the nonlinear behaviour of the electrolyser in terms of hydrogen and
@@ -473,7 +472,7 @@ class ElectrolyzerWasteHeat(Electrolyzer):
         separate components).
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
+        :type busses: dict
         :param model_to_solve: oemof model that will be solved
         :type model_to_solve: model
         """

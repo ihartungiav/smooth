@@ -174,10 +174,18 @@ class H2Chp(Component):
         # Return the according hydrogen production value [kg].
         return self.bp_energy_thermal[this_index]
 
-    def create_oemof_model(self, busses, model):
-        # Create the non-linear oemof component. The CHP has to be modelled as
-        # two components, while the piecewise linear transformer does not
-        # accept 2 outputs yet.
+    def add_to_oemof_model(self, busses, model):
+        """Creates a non-linear oemof Transformer component to be used in the oemof model
+
+        The CHP has to be modelled as two components
+        because the piecewise linear transformer does not accept 2 outputs yet.
+
+        :param busses: virtual buses used in the energy system
+        :type busses: dict
+        :param model: current oemof model
+        :type model: oemof model
+        :return: tuple of electric and thermal oemof components
+        """
 
         flow_electric = solph.Flow(
             nominal_value=self.bp_h2_consumed_electric_half[-1],
@@ -208,20 +216,7 @@ class H2Chp(Component):
         self.model_el = h2_chp_electric
         self.model_th = h2_chp_thermal
 
-        """
-        # Get the input H2 flows of both oemof components that need to be set equal.
-        flow_electric = model.nodes[len(model.nodes)-2].inputs[busses[self.bus_h2]]
-        flow_thermal = model.nodes[len(model.nodes) - 1].inputs[busses[self.bus_h2]]
-
-        # Get
-        fl_el = model.groups[self.name + '_electric'].inputs[busses[self.bus_h2]]
-        fl_th = model.groups[self.name + '_thermal'].inputs[busses[self.bus_h2]]
-        """
-        # Now set the two inflows of H2 in the electrical in the thermal CHP
-        # component to be the same.
-        # solph.constraints.equate_variables(model, flow_electric, flow_thermal)
-
-        return None
+        return (h2_chp_electric, h2_chp_thermal)
 
     def update_constraints(self, busses, model_to_solve):
         # Set a constraint so that the hydrogen inflow of the electrical and

@@ -429,13 +429,13 @@ def mutate(parent, attribute_variation):
         delta = min(delta_min, delta_max)
         # sigma influences spread of random numbers
         # try to keep between min and max of attribute
-        sigma = delta / 3 if delta > 0 else 1
+        sigma = delta / 3.0 if delta > 0 else 1.0
         # get new value within normal distribution around current value
         value = random.gauss(value, sigma)
         if attribute_variation[mut_gene_idx].val_step:
-            # quantized value
+            # quantize new value
             step = attribute_variation[mut_gene_idx].val_step
-            value = round(delta_min / step) * step + val_min
+            value = round((value - val_min) / step) * step + val_min
         # clip value to bounds
         value = min(max(value, val_min), val_max)
         child[mut_gene_idx] = value

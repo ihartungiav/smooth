@@ -60,7 +60,6 @@ class EnergySourceFromCsv (Component):
         # ------------------- PARAMETERS -------------------
         self.name = 'General_energy_source'
         self.nominal_value = 1
-        self.reference_value = 1
         self.csv_filename = None
         self.csv_separator = ','
         self.column_title = 0
@@ -74,18 +73,22 @@ class EnergySourceFromCsv (Component):
         self.data = func.read_data_file(self.path, self.csv_filename,
                                         self.csv_separator, self.column_title)
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Source component from the information given in the
         EnergySourceFromCSV class, to be used in the oemof model.
 
-        :param busses: List of the virtual buses used in the energy system
-        :type busses: list
-        :return: The 'energy_source_from_csv' oemof component
+        :param busses: virtual buses used in the energy system
+        :type busses: dict
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         energy_source_from_csv = solph.Source(
             label=self.name,
             outputs={busses[self.bus_out]: solph.Flow(
                 fix=self.data.iloc[self.sim_params.i_interval],
                 nominal_value=self.nominal_value,
-            )})
+                fixed=True)})
+
+        model.add(energy_source_from_csv)
         return energy_source_from_csv

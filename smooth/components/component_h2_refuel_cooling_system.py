@@ -107,13 +107,15 @@ class H2RefuelCoolingSystem(Component):
         self.electrical_energy = \
             (self.data * self.cool_spec_energy + self.standby_energy) / 3.6
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Sink component from information given in
         the H2RefuelCoolingSystem class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
-        :return: oemof 'h2_refuel_cooling_system' component
+        :type busses: dict
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         h2_refuel_cooling_system = solph.Sink(
             label=self.name,
@@ -122,4 +124,6 @@ class H2RefuelCoolingSystem(Component):
                     nominal_value=self.nominal_value,
                     fixed=True
                     )})
+
+        model.add(h2_refuel_cooling_system)
         return h2_refuel_cooling_system

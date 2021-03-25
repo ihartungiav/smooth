@@ -197,13 +197,15 @@ class CompressorH2(Component):
         self.Mr_H2 = 2.016 * 1e-3
         self.R_H2 = self.R / self.Mr_H2
 
-    def create_oemof_model(self, busses, _):
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Transformer component using the information given in
         the CompressorH2 class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
-        :return: the oemof compressor component
+        :type busses: dict
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         compressor = solph.Transformer(
             label=self.name,
@@ -217,6 +219,7 @@ class CompressorH2(Component):
                 busses[self.bus_el]: self.spec_compression_energy,
                 busses[self.bus_h2_out]: 1})
 
+        model.add(compressor)
         return compressor
 
     def prepare_simulation(self, components):

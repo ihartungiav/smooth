@@ -162,7 +162,7 @@ class FuelCellChp(Component):
         self.bus_el = None
         self.bus_th = None
         # Max. electrical output power [W].
-        self.power_max = None
+        self.power_max = 1000
         # Lifetime of the component [a]
         self.life_time = 15
         # Update the input parameters by the user.
@@ -242,17 +242,17 @@ class FuelCellChp(Component):
         this_index = self.bp_h2_consumed_th_half.index(h2_consumption)
         return self.bp_energy_th[this_index]
 
-    def create_oemof_model(self, busses, model):
+    def add_to_oemof_model(self, busses, model):
         """Creates two separate oemof Piecewise Linear Transformer components for the
         electrical and thermal production of the fuel cell CHP from information given
         in the FuelCellCHP class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
+        :type busses: dict
         :param model: oemof model containing the electrical energy production and
             thermal energy production of the fuel cell CHP
         :type model: model
-        :return: the oemof fuel cell CHP electric and thermal components
+        :return: tuple of electric and thermal oemof components
         """
         # The CHP has to be modelled as two components, while the piecewise linear
         # transformer does not accept 2 outputs yet.
@@ -285,8 +285,7 @@ class FuelCellChp(Component):
 
         self.model_el = fuel_cell_chp_electric
         self.model_th = fuel_cell_chp_thermal
-
-        return None
+        return (fuel_cell_chp_electric, fuel_cell_chp_thermal)
 
     def update_constraints(self, busses, model_to_solve):
         """Set a constraint so that the hydrogen inflow of the electrical and
@@ -295,7 +294,7 @@ class FuelCellChp(Component):
         therefore the two parts need to be separate components).
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
+        :type busses: dict
         :param model_to_solve: The oemof model that will be solved
         :type model_to_solve: model
         """

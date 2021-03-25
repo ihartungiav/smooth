@@ -17,7 +17,9 @@ Concept
 *******
 An oemof Transformer component is used to convert the chosen input bus into the
 chosen output bus, with a limitation on the value that can be transformed
-per timestep by the defined maximum input parameter.
+per timestep by the defined maximum input parameter. Applying an efficiency
+to the conversion of the input bus to the output bus is optional, with the
+default value set to 100%.
 """
 
 import oemof.solph as solph
@@ -34,6 +36,8 @@ class Gate(Component):
     :type bus_in: str
     :param bus_out: bus that leaves the gate component
     :type bus_out: str
+    :param efficiency: efficiency of the gate component
+    :type efficiency: numerical
     :param set_parameters(params): updates parameter default values (see generic Component class)
     :type set_parameters(params): function
     """
@@ -50,22 +54,31 @@ class Gate(Component):
         # Busses
         self.bus_in = None
         self.bus_out = None
+        self.efficiency = 1
 
         # ------------------- UPDATE PARAMETER DEFAULT VALUES -------------------
         self.set_parameters(params)
 
-    def create_oemof_model(self, busses, _):
+        if self.max_input <= 0:
+            raise ValueError("The maximum input of the component must be greater than zero!")
+
+    def add_to_oemof_model(self, busses, model):
         """Creates an oemof Transformer component from information given in
         the Gate class, to be used in the oemof model
 
         :param busses: virtual buses used in the energy system
-        :type busses: list
-        :return: oemof 'gate' component
+        :type busses: dict
+        :param model: current oemof model
+        :type model: oemof model
+        :return: oemof component
         """
         gate = solph.Transformer(
             label=self.name,
             inputs={busses[self.bus_in]: solph.Flow(variable_costs=self.artificial_costs,
                                                     nominal_value=self.max_input)},
-            outputs={busses[self.bus_out]: solph.Flow()}
+            outputs={busses[self.bus_out]: solph.Flow()},
+            conversion_factors={busses[self.bus_out]: self.efficiency}
         )
+
+        model.add(gate)
         return gate

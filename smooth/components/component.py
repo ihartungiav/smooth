@@ -166,8 +166,8 @@ class Component:
         which can be written here. Else, this function is used as placeholder for
         components without constraints.
 
-        :param busses: List of the virtual buses used in the energy system
-        :type busses: list
+        :param busses: Dict of the virtual buses used in the energy system
+        :type busses: dict
         :param model_to_solve: ToDo: look this up in oemof
         :type model_to_solve:
         :return: If used as a placeholder, nothing will be returned. Else, refer
@@ -312,3 +312,17 @@ class Component:
                     'In component {} CAPEX or fix_emissions are given '
                     'but the life_time is either None or not greater than zero. '
                     'Please choose another life_time value!'.format(self.name))
+
+    def add_to_oemof_model(self, busses, model):
+        """This function adds the specific component to the oemof energy system model
+        and has to be defined for each component.
+
+        :param busses: Dict of the virtual buses used in the energy system
+        :type busses: dict
+        :param model: current oemof model
+        :type model: oemof model
+
+        :raises NotImplementedError: NotImplementedError raised if the function is
+         not overwritten in specific component definition.
+        """
+        raise NotImplementedError("add_to_oemof_model not implemented, can't build model")
