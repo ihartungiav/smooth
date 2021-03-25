@@ -7,10 +7,8 @@ import pytest
 
 class TestBasic:
 
-    sim_params = SimulationParameters({"interval_time": 30})
-
     def test_init(self):
-        b = Battery({"sim_params": self.sim_params})
+        b = Battery({})
         assert hasattr(b, "bus_in_and_out")
         assert hasattr(b, "soc")
 
@@ -23,16 +21,14 @@ class TestBasic:
 
         # loss rate per day
         b = Battery({
-            "sim_params": self.sim_params,
             "loss_rate": 24  # 1% per hour
         })
-        assert b.loss_rate == 0.5  # 0.5 per timestep (half hour)
+        assert b.loss_rate == 1.0
 
     def test_prepare_simulation(self):
         b = Battery({
             "vac_in": 3,
             "vac_out": 4,
-            "sim_params": self.sim_params
         })
 
         # uninitialized
@@ -49,7 +45,6 @@ class TestBasic:
             "vac_out": 4,
             "soc_wanted": 1,
             "soc_init": 0.5,
-            "sim_params": self.sim_params
         })
         b.prepare_simulation(None)
         assert b.current_vac == [1, 2]
@@ -60,7 +55,6 @@ class TestBasic:
             "c_rate_charge": 3,
             "c_rate_discharge": 3,
             "battery_capacity": 4,
-            "sim_params": self.sim_params
         })
         b.prepare_simulation(None)
         assert b.p_in_max == 12
@@ -69,7 +63,6 @@ class TestBasic:
     def test_add_to_oemof_model(self):
         b = Battery({
             "bus_in_and_out": "foo",
-            "sim_params": self.sim_params
         })
         oemof_model = solph.EnergySystem()
         component = b.add_to_oemof_model({"foo": solph.Bus(label="foo")}, oemof_model)
@@ -80,35 +73,46 @@ class TestBasic:
 
 class TestUpdate:
 
-    sim_params = SimulationParameters({"interval_time": 30, "n_intervals": 2})
+    sim_params = SimulationParameters({"interval_time": 60, "n_intervals": 2})
     sim_params.i_interval = 0
-    oemof_model = solph.EnergySystem(
-        timeindex=sim_params.date_time_index[0:1],
-        freq='{}min'.format(sim_params.interval_time)
-    )
 
     def test_update_states(self):
         # simulate one smooth iteration
-        # build energy model with two batteries, connected by a bus
-        bus = solph.Bus(label="foo")
-        self.oemof_model.add(bus)
+
+        oemof_model = solph.EnergySystem(
+            timeindex = self.sim_params.date_time_index[0:1],
+            freq='{}min'.format(self.sim_params.interval_time)
+        )
+
+        # build energy model with two batteries, not connected to anything
+        bus1 = solph.Bus(label="bus1")
+        bus2 = solph.Bus(label="bus2")
+        oemof_model.add(bus1, bus2)
+        # one battery with loss_rate
         b1 = Battery({
             "name": "bat1",
-            "bus_in_and_out": "foo",
+            "bus_in_and_out": "bus1",
             "soc_init": 1,
-            "loss_rate": 24,  # 1/h -> 0.5 per interval
-            "sim_params": self.sim_params
+            "loss_rate": 12,  # 1/h -> 0.5 per interval
+            "sim_params": self.sim_params,
+            "soc_min": 0,
+            # "battery_capacity": 1
+            # "efficiency_charge": 1,
+            # "efficiency_discharge": 1
         })
         b1.prepare_simulation(None)
-        b1.add_to_oemof_model({"foo": bus}, self.oemof_model)
+        b1.add_to_oemof_model({"bus1": bus1}, oemof_model)
+        # one battery without loss rate
         b2 = Battery({
             "name": "bat2",
-            "bus_in_and_out": "foo",
+            "bus_in_and_out": "bus2",
+            "loss_rate": 0,
             "sim_params": self.sim_params
         })
         b2.prepare_simulation(None)
-        b2.add_to_oemof_model({"foo": bus}, self.oemof_model)
-        model_to_solve = solph.Model(self.oemof_model)
+        b2.add_to_oemof_model({"bus2": bus2}, oemof_model)
+        model_to_solve = solph.Model(oemof_model)
+
         # solve model
         oemof_results = model_to_solve.solve(solver='cbc', solve_kwargs={'tee': False})
         assert oemof_results["Solver"][0]["Status"].value == "ok"
