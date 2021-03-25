@@ -111,7 +111,7 @@ class TestUpdate:
 
         # solve model
         oemof_results = model_to_solve.solve(solver='cbc', solve_kwargs={'tee': False})
-        assert oemof_results["Solver"][0]["Status"].value == "ok"
+        assert oemof_results["Solver"][0]["Status"] == "ok"
         results = solph.processing.results(model_to_solve)
         assert results is not None
 
@@ -130,5 +130,5 @@ class TestUpdate:
             assert battery.soc > battery.soc_min
 
         # check loss rate
-        assert b1.soc == 0.5  # todo: Fail, but why??
+        assert b1.soc == 0.5
         assert b2.soc == b2.soc_init
