@@ -77,7 +77,7 @@ class TestUpdate:
 
         # solve model
         oemof_results = model_to_solve.solve(solver='cbc', solve_kwargs={'tee': False})
-        assert oemof_results["Solver"][0]["Status"].value == "ok"
+        assert oemof_results["Solver"][0]["Status"] == "ok"
         results = solph.processing.results(model_to_solve)
         assert results is not None
 
