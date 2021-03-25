@@ -80,7 +80,7 @@ class TestUpdate:
         # simulate one smooth iteration
 
         oemof_model = solph.EnergySystem(
-            timeindex = self.sim_params.date_time_index[0:1],
+            timeindex=self.sim_params.date_time_index[0:1],
             freq='{}min'.format(self.sim_params.interval_time)
         )
 
