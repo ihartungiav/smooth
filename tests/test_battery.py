@@ -21,9 +21,9 @@ class TestBasic:
 
         # loss rate per day
         b = Battery({
-            "loss_rate": 24  # 1% per hour
+            "loss_rate": 12  # 50% per hour
         })
-        assert b.loss_rate == 1.0
+        assert b.loss_rate == 0.5
 
     def test_prepare_simulation(self):
         b = Battery({
@@ -93,12 +93,8 @@ class TestUpdate:
             "name": "bat1",
             "bus_in_and_out": "bus1",
             "soc_init": 1,
-            "loss_rate": 12,  # 1/h -> 0.5 per interval
-            "sim_params": self.sim_params,
-            "soc_min": 0,
-            # "battery_capacity": 1
-            # "efficiency_charge": 1,
-            # "efficiency_discharge": 1
+            "loss_rate": 12,  # 0.5/h
+            "sim_params": self.sim_params
         })
         b1.prepare_simulation(None)
         b1.add_to_oemof_model({"bus1": bus1}, oemof_model)
