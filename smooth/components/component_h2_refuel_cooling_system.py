@@ -120,9 +120,8 @@ class H2RefuelCoolingSystem(Component):
         h2_refuel_cooling_system = solph.Sink(
             label=self.name,
             inputs={busses[self.bus_el]: solph.Flow(
-                    actual_value=self.electrical_energy.iloc[self.sim_params.i_interval],
-                    nominal_value=self.nominal_value,
-                    fixed=True
+                    fix=self.electrical_energy.iloc[self.sim_params.i_interval],
+                    nominal_value=self.nominal_value
                     )})
 
         model.add(h2_refuel_cooling_system)

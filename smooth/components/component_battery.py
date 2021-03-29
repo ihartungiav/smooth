@@ -74,7 +74,6 @@ takes the energy losses during the (dis-)charging process into account:
 
 import oemof.solph as solph
 from .component import Component
-from oemof.outputlib import views
 
 
 class Battery(Component):
@@ -197,7 +196,7 @@ class Battery(Component):
         # The in- / and outflow of power are calculated using the battery capacity and the C-rate
         self.p_in_max = self.c_rate_charge * self.battery_capacity
         self.p_out_max = self.c_rate_discharge * self.battery_capacity
-        self.loss_rate = (self.loss_rate / 24) * (self.sim_params.interval_time / 60)
+        self.loss_rate = (self.loss_rate / 24)  # oemof calculates loss rate per hour
 
         # ------------------- VARIABLE ARTIFICIAL COSTS -------------------
         self.current_vac = [0, 0]
@@ -260,12 +259,12 @@ class Battery(Component):
         :type results: object
         :return: updated state values for each state in the 'state' dict
         """
-        data_storage = views.node(results, self.name)
+        data_storage = solph.views.node(results, self.name)
         df_storage = data_storage["sequences"]
 
         # Loop Through the data frame values and update states accordingly.
         for i_result in df_storage:
-            if i_result[1] == "capacity":
+            if i_result[1] == "storage_content":
                 if "soc" not in self.states:
                     # Initialize a.n array that tracks the state SoC
                     self.states["soc"] = [None] * self.sim_params.n_intervals

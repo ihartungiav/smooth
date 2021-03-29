@@ -86,9 +86,8 @@ class EnergySourceFromCsv (Component):
         energy_source_from_csv = solph.Source(
             label=self.name,
             outputs={busses[self.bus_out]: solph.Flow(
-                actual_value=self.data.iloc[self.sim_params.i_interval],
-                nominal_value=self.nominal_value,
-                fixed=True)})
+                fix=self.data.iloc[self.sim_params.i_interval],
+                nominal_value=self.nominal_value)})
 
         model.add(energy_source_from_csv)
         return energy_source_from_csv
