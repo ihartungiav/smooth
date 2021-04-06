@@ -30,3 +30,35 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
     - Supply
 - Basic tests
 - Documentation stub
+
+## [0.3.0] - TBD
+
+### Changed
+- general
+    - license changed to dual MIT/Apache-2.0
+    - use development branch of oemof-solph
+    - documentation moved to [Read the Docs](https://smooth.readthedocs.io)
+- components
+    - renamed Chp to H2Chp
+- functions
+    - optimization changed to multi-objective evolutionary algortihm based on NSGA-II, optionally with gradient ascent
+- models
+    - allow None value for fixed cost
+    - interval time is adjustable
+
+### Added
+- general
+    - tests and examples for all components
+    - emissions
+- components
+    - BiogasConverter
+    - BiogasSmrPsa
+    - ElectrolyzerWasteHeat
+    - Gate
+    - PemElectrolyzer
+    - PowerConverter
+    - H2-trailer components (Gates, H2Delivery)
+    - VarGrid
+    - External components
+- functions
+    - added debug flag to SimulationParameters
