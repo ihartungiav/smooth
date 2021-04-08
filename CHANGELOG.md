@@ -31,24 +31,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Basic tests
 - Documentation stub
 
-## [0.3.0] - TBD
+## [0.3.0] - 2021-04-08
 
 ### Changed
 - general
     - license changed to dual MIT/Apache-2.0
     - use development branch of oemof-solph
+    - included oemof.thermal
     - documentation moved to [Read the Docs](https://smooth.readthedocs.io)
 - components
     - renamed Chp to H2Chp
 - functions
     - optimization changed to multi-objective evolutionary algortihm based on NSGA-II, optionally with gradient ascent
 - models
-    - allow None value for fixed cost
     - interval time is adjustable
+    - components can have 'variable' costs (CAPEX and OPEX), depending on the value of one of its parameters
+    - allow None value for fixed cost
 
 ### Added
 - general
-    - tests and examples for all components
+    - tests for all components
+    - examples for most components
     - emissions
 - components
     - BiogasConverter
