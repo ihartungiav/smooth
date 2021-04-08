@@ -1,7 +1,10 @@
 .idea*
 test/*
-*.png
+build/*
+doc/build
+dist/*
 *.pickle
 *.egg-info
 *.lp
+.*.sw[op]
 __pycache__
