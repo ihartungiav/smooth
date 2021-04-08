@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - general
     - license changed to dual MIT/Apache-2.0
-    - use development branch of oemof-solph
+    - use development branch of oemof.solph
     - included oemof.thermal
     - documentation moved to [Read the Docs](https://smooth.readthedocs.io)
 - components
