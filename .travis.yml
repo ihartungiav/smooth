@@ -23,7 +23,6 @@ script:
   - MPLBACKEND=SVG python smooth/examples/run_smooth_example.py
 
   # Build docs
-  - pip install -r requirements.txt
   - pip install -r doc/requirements.txt
   - make -C doc html
 
