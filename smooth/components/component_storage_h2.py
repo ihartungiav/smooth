@@ -110,7 +110,6 @@ The pressure of the storage is calculated as follows:
 
 import oemof.solph as solph
 from .component import Component
-from oemof.outputlib import views
 
 
 class StorageH2 (Component):
@@ -285,12 +284,12 @@ class StorageH2 (Component):
         :type results: object
         :return: updated state values for each state in the 'state' dict
         """
-        data_storage = views.node(results, self.name)
+        data_storage = solph.views.node(results, self.name)
         df_storage = data_storage['sequences']
 
         # Loop Through the data frame values and update states accordingly.
         for i_result in df_storage:
-            if i_result[1] == 'capacity':
+            if i_result[1] == 'storage_content':
                 if 'storage_level' not in self.states:
                     # Initialize an array that tracks the state stored mass.
                     self.states['storage_level'] = [None] * self.sim_params.n_intervals

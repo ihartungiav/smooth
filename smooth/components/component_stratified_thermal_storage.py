@@ -32,7 +32,6 @@ References
 import oemof.solph as solph
 from smooth.components.component import Component
 from numpy import pi
-from oemof.outputlib import views
 import smooth.framework.functions.functions as func
 import os
 
@@ -273,7 +272,7 @@ class StratifiedThermalStorage (Component):
         :type results: object
         :return: updated state values for each state in the 'state' dict
         """
-        data_storage = views.node(results, self.name)
+        data_storage = solph.views.node(results, self.name)
         df_storage = data_storage['sequences']
 
         # Loop Through the data frame values and update states accordingly.

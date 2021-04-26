@@ -3,7 +3,7 @@ The generic component class is the mother class for all of the components. The p
 functions defined here are inherited by each of the specific components.
 """
 
-from oemof.outputlib import views
+from oemof.solph import views
 from smooth.framework.functions.update_fitted_cost import update_financials, update_emissions
 from smooth.framework.functions.update_annuities import update_annuities
 
