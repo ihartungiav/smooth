@@ -1,69 +1,179 @@
-import importlib
-import math
-from oemof import solph
-from oemof.outputlib import processing
+"""This is the core of smooth.
+It solves (M)ILP of an energy system model for discrete time steps using the
+Open Energy Modelling Framework solver (`oemof-solph <https://github.com/oemof/oemof-solph>`_).
+
+**********
+How to use
+**********
+The :func:`run_smooth` function expects an energy model. Such a model consists of:
+
+* energy sources
+* energy sinks
+* energy transformers
+* buses to transport energy
+
+Additionally, simulation parameters are needed to run the model.
+A model is  therefore defined as a dictionary containing all *components*,
+buses (grouped as *busses*) and simulation parameters (grouped as *sim_params*,
+see :class:`smooth.framework.simulation_parameters.SimulationParameters`).
+
+Example::
+
+    {
+        components: {
+            name_of_first_component: {
+                component: ...,
+                capex: ...,
+                opex: ...,
+                ...
+            },
+            ...
+        },
+        busses: [
+            name_of_first_bus,
+            name_of_second_bus,
+            ...
+        ],
+        sim_params: {
+            start_date: ...,
+            n_intervals: ...,
+            interval_time: ...,
+            interest_rate: 0.03,
+            ...
+        }
+    }
+
+.. note::
+    Legacy models (version < 0.2.0) define their components as a list
+    with an extra field *name* for each component. This is deprecated.
+
+******
+Result
+******
+Two items are returned. The second is a string describing the oemof solver return status.
+You want this to be 'ok', although `other values are possible
+<http://www.pyomo.org/blog/2015/1/8/accessing-solver>`_.
+The first item returned is a list of all components, each updated with
+
+- sim_params: the original simulation parameters, plus *date_time_index* \
+    for each time step and *sim_time_span* in minutes
+- results: results from the simulation
+
+    - variable_costs*
+    - art_costs*
+    - variable_emissions*
+    - annuity_capex
+    - annuity_opex
+    - annuity_variable_costs
+    - annuity_total
+    - annual_fix_emissions
+    - annual_op_emissions
+    - annual_variable_emissions
+    - annual_total_emissions
+- states: dictionary with component-specific attributes.\
+    Each entry is a list with values for each time step
+- flows: dictionary with each flow of this component.\
+    Key is tuple (from, to), entry is list with value for each time step
+- data: pandas dataframe
+- (component-specific attributes)
+
+\\* a list with a value for each time step
+
+**************
+Implementation
+**************
+The concept of :func:`run_smooth` is demonstrated in the figure below:
+
+.. figure:: /images/run_smooth.png
+    :width: 60 %
+    :alt: run_smooth.png
+    :align: center
+
+    Fig.1: Concept of run_smooth function.
+
+The :func:`run_smooth` function has three distinct phases:
+initialization, simulation and post processing.
+
+Initialization
+--------------
+There is not much to see here. Mainly, component instances get created from the
+model description. For legacy models (version < 0.2.0), the component list is
+converted to a dictionary. No oemof model is built here.
+
+Simulation
+----------
+This is the main part of the function. For each time step, an oemof model is
+solved and evaluated:
+
+#. print current time step to console if *print_progress* is set in parameters
+#. initialize oemof energy system model
+#. create buses
+#. update components and add them to the oemof model
+#. update bus constraints
+#. write lp file in current directory
+#. call solver for model
+#. check returned status for non#.optimal solution
+#. handle results for each component
+
+    #. update flows
+    #. update states
+    #. update costs
+    #. update emissions
+
+Post-processing
+---------------
+After all time steps have been computed, call the *generate_results* function of each component.
+Finally, return the updated components and the last oemof status.
+"""
+
+import oemof.solph as solph
+
 from smooth.framework.simulation_parameters import SimulationParameters as sp
+from smooth.framework.functions.debug import get_df_debug, show_debug
+from smooth.framework.exceptions import SolverNonOptimalError
+from smooth.framework.functions.functions import create_component_obj
 
 
 def run_smooth(model):
-    # Run the smooth simulation framework.
-    # Parameters:
-    #  model: smooth model object containing parameters for components, simulation and busses.
+    """Runs the smooth simulation framework
 
-    """ INITIALIZATION """
-    # CHECK IF COMPONENT NAMES ARE UNIQUE
-    # Check if all component names are unique, otherwise throw an error. Therefor first get all component names.
-    comp_names = []
-    for this_comp in model['components']:
-        comp_names.append(this_comp['name'])
+    :param model: smooth model object containing parameters for components, simulation and busses
+    :type model: dictionary
+    :return: results of all components and oemof status
+    :rtype: tuple of components and string
+    :raises: *SolverNonOptimalError* if oemof result is not ok and not optimal
+    """
 
-    # Then check if all component names are unique.
-    for this_comp_name in comp_names:
-        if comp_names.count(this_comp_name) is not 1:
-            raise ValueError('Component name "{}" is not unique, please name components unique.'.format(this_comp_name))
+    # ------------------- INITIALIZATION -------------------
+    # legacy: components may be list. Convert to dict.
+    if isinstance(model["components"], list):
+        names = [c.pop("name") for c in model["components"]]
+        model.update({'components': dict(zip(names, model["components"]))})
 
     # GET SIMULATION PARAMETERS
     # Create an object with the simulation parameters.
     sim_params = sp(model['sim_params'])
 
     # CREATE COMPONENT OBJECTS
-    components = []
-    for this_comp in model['components']:
-        # Add simulation parameters to the components so they can be used
-        this_comp['sim_params'] = sim_params
-        # Loop through all components of the model and load the component classes.
-        this_comp_name = this_comp['component']
-        # Import the module of the component.
-        this_comp_module = importlib.import_module('smooth.components.component_' + this_comp_name)
-        # While class name is camel case, underscores has to be removed and letters after underscores have to be capital
-        class_name = ''
-        if this_comp_name.isupper():
-            class_name = this_comp_name
-        else:
-            this_comp_name_split = this_comp_name.split('_')
-            for this_comp_name_part in this_comp_name_split:
-                class_name += this_comp_name_part.capitalize()
-        # Load the class (which by convention has a name with a capital first letter and camel case).
-        this_comp_class = getattr(this_comp_module, class_name)
-        # Initialize the component.
-        this_comp_obj = this_comp_class(this_comp)
-        # Check if this component is valid.
-        this_comp_obj.check_validity()
-        # Add this component to the list containing all components.
-        components.append(this_comp_obj)
+    components = create_component_obj(model, sim_params)
 
-    """ SIMULATION """
+    # There are no results yet.
+    df_results = None
+    results_dict = None
+
+    # ------------------- SIMULATION -------------------
     for i_interval in range(sim_params.n_intervals):
         # Save the interval index of this run to the sim_params to make it usable later on.
         sim_params.i_interval = i_interval
         if sim_params.print_progress:
-            print('Simulating interval {}/{}'.format(i_interval, sim_params.n_intervals))
+            print('Simulating interval {}/{}'.format(i_interval+1, sim_params.n_intervals))
 
         # Initialize the oemof energy system for this time step.
         this_time_index = sim_params.date_time_index[i_interval: (i_interval + 1)]
-        oemof_model = solph.EnergySystem(timeindex=this_time_index, freq='{}min'.format(sim_params.interval_time))
+        oemof_model = solph.EnergySystem(timeindex=this_time_index,
+                                         freq='{}min'.format(sim_params.interval_time))
 
-        """ CREATE THE OEMOF MODEL FOR THIS INTERVAL """
+        # ------------------- CREATE THE OEMOF MODEL FOR THIS INTERVAL -------------------
         # Create all busses and save them to a dict for later use in the components.
         busses = {}
 
@@ -77,16 +187,10 @@ def run_smooth(model):
         for this_comp in components:
             # Execute the prepare simulation step (if this component has one).
             this_comp.prepare_simulation(components)
-            # Get the oemof representation of this component.
-            this_oemof_model = this_comp.create_oemof_model(busses, oemof_model)
-            if this_oemof_model is not None:
-                # Add the component to the oemof model.
-                oemof_model.add(this_oemof_model)
-            else:
-                # If None is given back, no model is supposed to be added.
-                pass
+            # add oemof representation of this component to model
+            this_comp.add_to_oemof_model(busses, oemof_model)
 
-        """ RUN THE SIMULATION """
+        # ------------------- RUN THE SIMULATION -------------------
         # Do the simulation for this time step.
         model_to_solve = solph.Model(oemof_model)
 
@@ -97,34 +201,41 @@ def run_smooth(model):
             # Save the set of linear equations for the first interval.
             model_to_solve.write('./oemof_model.lp', io_options={'symbolic_solver_labels': True})
 
-        model_to_solve.solve(solver='cbc', solve_kwargs={'tee': False})
+        oemof_results = model_to_solve.solve(solver='cbc', solve_kwargs={'tee': False})
 
-        """ CHECK IF SOLVING WAS SUCCESSFUL """
-        # Get the meta results.
-        # meta_results = processing.meta_results(model_to_solve)
+        # ------------------- CHECK IF SOLVING WAS SUCCESSFUL -------------------
+        # If the status and temination condition is not ok/optimal, get and
+        # print the current flows and status
+        status = oemof_results["Solver"][0]["Status"]
+        termination_condition = oemof_results["Solver"][0]["Termination condition"]
+        if status != "ok" and termination_condition != "optimal":
+            if sim_params.show_debug_flag:
+                new_df_results = solph.processing.create_dataframe(model_to_solve)
+                df_debug = get_df_debug(df_results, results_dict, new_df_results)
+                show_debug(df_debug, components)
+            raise SolverNonOptimalError('solver status: ' + status +
+                                        " / termination condition: " + termination_condition)
 
-        """ HANDLE RESULTS """
+        # ------------------- HANDLE RESULTS -------------------
         # Get the results of this oemof run.
-        results = processing.results(model_to_solve)
+        results = solph.processing.results(model_to_solve)
+        if sim_params.show_debug_flag:
+            results_dict = solph.processing.parameter_as_dict(model_to_solve)
+            df_results = solph.processing.create_dataframe(model_to_solve)
 
         # Loop through every component and call the result handling functions
         for this_comp in components:
             # Update the flows
-            this_comp.update_flows(results, sim_params)
+            this_comp.update_flows(results)
             # Update the states.
-            this_comp.update_states(results, sim_params)
+            this_comp.update_states(results)
             # Update the costs and artificial costs.
-            this_comp.update_costs(results, sim_params)
+            this_comp.update_var_costs()
+            # Update the costs and artificial costs.
+            this_comp.update_var_emissions()
 
     # Calculate the annuity for each component.
     for this_comp in components:
         this_comp.generate_results()
 
-    return components
-
-
-
-
-
-
-
+    return components, status
